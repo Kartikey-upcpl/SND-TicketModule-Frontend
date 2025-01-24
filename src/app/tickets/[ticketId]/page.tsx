@@ -1,0 +1,509 @@
+"use client";
+import React, { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
+import UpdateTicketStatus from "@/components/Modals/UpdateTicketStatus";
+import { toast } from "react-toastify";
+import Image from "next/image";
+import UploadMedia from "@/app/upload-media/page";
+import { handleImageUploadForTicket } from "@/api/action/mediaAction";
+import { updateTicketAction } from "@/api/action/ticketAction";
+import { useUser } from "@/context/UserContext";
+
+const TicketPage: React.FC = () => {
+    const { ticketId } = useParams(); // Get ticketId from the URL
+    const [ticket, setTicket] = useState<any>(null);
+    const { user } = useUser();
+
+    console.log("useruseruser", user)
+    const [error, setError] = useState<string | null>(null);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isEditingReverseAWB, setIsEditingReverseAWB] = useState(false);
+    const [isForwardAWB, setIsForwardAWB] = useState(false);
+    const [reverseAwbValue, setReverseAwbValue] = useState<string>("");
+    const [forwardAwbValue, setForwardAwbValue] = useState<string>("");
+    const [isResolving, setIsResolving] = useState<boolean>(false); // For showing the text box
+    const [resolveComment, setResolveComment] = useState<string>(""); // Comment input
+    const [isEditingDescription, setIsEditingDescription] = useState(false);
+    const [updatedDescription, setUpdatedDescription] = useState<string>("");
+    const [comments, setComments] = useState<any[]>([]); // Ensure it's an array
+    const [newComment, setNewComment] = useState<string>(""); // New: New comment input
+
+
+    useEffect(() => {
+        const fetchTicketAndComments = async () => {
+            try {
+                if (!ticketId) throw new Error("No ticketId provided");
+
+                // Fetch ticket details
+                const ticketResponse = await fetch(`http://localhost:3000/api/tickets/${ticketId}`);
+                if (!ticketResponse.ok) throw new Error("Failed to fetch ticket details");
+                const ticketData = await ticketResponse.json();
+                setTicket(ticketData.ticket);
+                setReverseAwbValue(ticketData.ticket?.reversePickupAWB || "");
+                setForwardAwbValue(ticketData.ticket?.forwardShippingAWB || "");
+
+                // Fetch comments
+                const commentsResponse = await fetch(`http://localhost:3000/api/tickets/comments/${ticketId}`);
+                console.log("commentsResponse", commentsResponse)
+                if (!commentsResponse.ok) throw new Error("Failed to fetch comments");
+                const commentsData = await commentsResponse.json();
+                setComments(commentsData);
+            } catch (err: any) {
+                console.error("Error loading ticket or comments:", err.message);
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchTicketAndComments();
+    }, [ticketId]);
+
+    const saveReversePickup = async () => {
+        try {
+            const response = await fetch(
+                `http://localhost:3000/api/tickets/update-reverse-AWB/${ticket?._id}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ reversePickupAWB: reverseAwbValue, updatedBy: user?.fullname }),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Failed to update Reverse Pickup AWB");
+            }
+
+            toast.success("Reverse Pickup AWB updated successfully!");
+            setTicket((prev: any) => ({
+                ...prev,
+                reversePickupAWB: reverseAwbValue,
+            }));
+        } catch (error: any) {
+            toast.error(`Failed to update AWB: ${error.message}`);
+        } finally {
+            setIsEditingReverseAWB(false);
+        }
+    };
+
+    const saveForwardPickup = async () => {
+        try {
+            const response = await fetch(
+                `http://localhost:3000/api/tickets/update-forward-AWB/${ticket?._id}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ forwardShippingAWB: forwardAwbValue, updatedBy: user?.fullname }),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Failed to update Forward Shipping AWB");
+            }
+
+            toast.success("Forward Shipping AWB updated successfully!");
+            setTicket((prev: any) => ({
+                ...prev,
+                forwardShippingAWB: forwardAwbValue,
+            }));
+        } catch (error: any) {
+            toast.error(`Failed to update AWB: ${error.message}`);
+        } finally {
+            setIsForwardAWB(false);
+        }
+    };
+
+    const resolveTicket = async () => {
+        if (!resolveComment) {
+            toast.error("Please enter a comment before resolving the ticket.");
+            return;
+        }
+        try {
+            const response = await fetch(
+                `http://localhost:3000/api/tickets/resolve-ticket/${ticket?._id}`,
+                {
+                    method: "PUT",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ resolveTicketRemark: resolveComment, updatedBy: user?.fullname }),
+                }
+            );
+
+            if (!response.ok) {
+                throw new Error("Failed to resolve ticket");
+            }
+
+            toast.success("Ticket resolved successfully!");
+            setTicket((prev: any) => ({
+                ...prev,
+                status: "Resolved",
+            }));
+            setIsResolving(false);
+        } catch (error: any) {
+            toast.error(`Failed to resolve ticket: ${error.message}`);
+        }
+    };
+
+    const uploadImages = async (urls: string[]) => {
+        const result = await handleImageUploadForTicket(ticket?._id, urls);
+        if (result.status === "success") {
+            toast.success("Images uploaded successfully!");
+            setTicket((prev: any) => ({
+                ...prev,
+                imageProofLink: result.data.imageProofLink,
+            }));
+        } else {
+            toast.error(result.message);
+        }
+    };
+
+    const mimeMap: Record<string, string> = {
+        jpg: 'image/jpeg',
+        jpeg: 'image/jpeg',
+        png: 'image/png',
+        gif: 'image/gif',
+        mp4: 'video/mp4',
+        mpeg: 'video/mpeg',
+        avi: 'video/avi',
+    };
+
+    function getMimeType(link: string): string | null {
+        const extension = link.split('.').pop()?.toLowerCase();
+        return extension && mimeMap[extension] ? mimeMap[extension] : null;
+    }
+
+    function getStatusColor(status: string): string {
+        switch (status) {
+            case "In-Progress":
+                return "bg-yellow-100 text-yellow-700";
+            case "Closed":
+                return "bg-red-100 text-red-700";
+            case "Hold":
+                return "bg-blue-100 text-blue-700";
+            default:
+                return "bg-gray-100 text-gray-700";
+        }
+    }
+
+    const handleUpdateDescription = async () => {
+        if (!updatedDescription) {
+            toast.error("Please fill description field to update");
+            return;
+        }
+        try {
+            const updatedTicket = await updateTicketAction(ticket?._id, { "description": updatedDescription }, user?.fullname || "");
+            if (updatedTicket.status === "error") {
+                throw new Error(updatedTicket.message);
+            }
+            toast.success("Ticket updated successfully!");
+        } catch (error: any) {
+            toast.error(`Failed to update ticket: ${error.message}`);
+        } finally {
+            setIsEditingDescription(false);
+        }
+    };
+
+    const handleAddComment = async () => {
+        if (!newComment.trim()) {
+            toast.error("Comment cannot be empty.");
+            return;
+        }
+        console.log("comment", newComment)
+        try {
+            const response = await fetch(
+                `http://localhost:3000/api/tickets/add-comment/${ticket?._id}`,
+                {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ comment: newComment, commentedBy: user?.fullname }), // Replace with actual user ID
+                }
+            );
+
+            if (!response.ok) throw new Error("Failed to add comment");
+
+            const updatedComments = await response.json();
+            setComments(updatedComments); // Update comments list
+            setNewComment(""); // Clear input
+            toast.success("Comment added successfully!");
+        } catch (err: any) {
+            console.error("Error adding comment:", err.message);
+            toast.error("Failed to add comment.");
+        }
+    };
+
+    if (loading) return <p>Loading ticket details...</p>;
+    if (error) return <p>Error: {error}</p>;
+    if (!ticket) return <p>No ticket found.</p>;
+
+    return (
+        <div className="flex p-6 mx-auto bg-white shadow-md rounded-md max-w-full">
+            <div className="w-3/4 md:w-7/10 p-6 bg-white  rounded-lg">
+                <h1 className="text-4xl font-extrabold text-center mb-8 text-indigo-600">🎫 Ticket Details</h1>
+
+                <div className="flex justify-between items-center mb-6">
+                    <p className="text-lg font-semibold">
+                        <span className="text-gray-600">Ticket ID:</span> <span className="text-indigo-700">{ticket.ticketId}</span>
+                    </p>
+                    <button
+                        onClick={() => setIsModalOpen(true)}
+                        className="px-4 py-2 bg-indigo-500 text-white font-medium rounded-lg shadow hover:bg-indigo-600 transition duration-200"
+                    >
+                        Update Ticket
+                    </button>
+                    <UpdateTicketStatus
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)}
+                        ticketId={ticket._id}
+                        username={user?.fullname || ""}
+                    />
+                </div>
+
+                {/* Ticket Details */}
+                <div className="space-y-4 mb-6">
+                    <p>
+                        <strong className="text-gray-700">Customer:</strong> {ticket.customer}
+                    </p>
+                    <p>
+                        <strong className="text-gray-700">Status:</strong>{" "}
+                        <span className={`px-2 py-1 rounded-full ${getStatusColor(ticket.status)}`}>
+                            {ticket.status.toUpperCase()}
+                        </span>
+                    </p>
+                    <p>
+                        <strong className="text-gray-700">Issue:</strong> {ticket.issue}
+                    </p>
+                    <div>
+                        <strong className="text-gray-700">Description:</strong>
+                        {isEditingDescription ? (
+                            <div className="flex items-center space-x-4 mt-3">
+                                <textarea
+                                    rows={3}
+                                    className="border w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    value={updatedDescription}
+                                    onChange={(e) => setUpdatedDescription(e.target.value)}
+                                />
+                                <button
+                                    className="px-4 py-2 bg-green-500 text-white font-medium rounded-lg shadow hover:bg-green-600 transition duration-200"
+                                    onClick={handleUpdateDescription}
+                                >
+                                    Save
+                                </button>
+                            </div>
+                        ) : (
+                            <div className="flex items-center justify-between mt-3">
+                                <p className="text-gray-600">{ticket.description || "N/A"}</p>
+                                <button
+                                    className="px-4 py-2 bg-indigo-500 text-white font-medium rounded-lg shadow hover:bg-indigo-600 transition duration-200"
+                                    onClick={() => setIsEditingDescription(true)}
+                                >
+                                    Edit
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Uploaded Media */}
+                <div className="mb-6">
+                    <strong className="text-gray-700">Uploaded Media:</strong>
+                    {ticket.imageProofLink && ticket.imageProofLink.length > 0 ? (
+                        <div className="flex flex-wrap gap-4 mt-3">
+                            {ticket.imageProofLink.map((link: string, index: number) => {
+                                const mimeType = getMimeType(link.trim());
+                                const isImage = ["image/jpeg", "image/png", "image/gif"].includes(mimeType || "");
+                                const isVideo = ["video/mp4", "video/mpeg", "video/avi"].includes(mimeType || "");
+
+                                return isImage ? (
+                                    <a
+                                        key={`image-${index}`}
+                                        href={link.trim()}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="block w-32 h-32 rounded-lg shadow-md overflow-hidden border"
+                                    >
+                                        <img
+                                            src={link.trim()}
+                                            alt={`Uploaded image ${index + 1}`}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    </a>
+                                ) : isVideo ? (
+                                    <a
+                                        key={`video-${index}`}
+                                        href={link.trim()}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="block w-32 h-32 rounded-lg shadow-md overflow-hidden border"
+                                    >
+                                        <video
+                                            src={link.trim()}
+                                            className="w-full h-full"
+                                            controls
+                                        >
+                                            Your browser does not support the video tag.
+                                        </video>
+                                    </a>
+                                ) : (
+                                    <p key={`unsupported-${index}`} className="text-red-500">
+                                        Unsupported media type.
+                                    </p>
+                                );
+                            })}
+                        </div>
+                    ) : (
+                        <div className="mt-3">
+                            <p className="text-gray-600">No media found. Please upload images or videos:</p>
+                            <UploadMedia ticketId={ticket.ticketId} onUpload={uploadImages} />
+                        </div>
+                    )}
+                </div>
+
+                {/* Priority */}
+                <p>
+                    <strong className="text-gray-700">Priority:</strong>{" "}
+                    <span className="text-indigo-700">{ticket.priority}</span>
+                </p>
+
+                {/* Reverse and Forward AWB */}
+                {ticket.issue === "Replacement Pickup" && (
+                    <>
+                        {/* Reverse Pickup */}
+                        <div className="mt-6">
+                            <strong className="text-gray-700">Reverse Pickup AWB:</strong>
+                            {isEditingReverseAWB ? (
+                                <div className="flex items-center space-x-4 mt-3">
+                                    <textarea
+                                        rows={3}
+                                        className="border w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        value={reverseAwbValue}
+                                        onChange={(e) => setReverseAwbValue(e.target.value)}
+                                    />
+                                    <button
+                                        className="px-4 py-2 bg-green-500 text-white font-medium rounded-lg shadow hover:bg-green-600 transition duration-200"
+                                        onClick={saveReversePickup}
+                                    >
+                                        Save
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-between mt-3">
+                                    <p className="text-gray-600">{ticket.reversePickupAWB || "N/A"}</p>
+                                    <button
+                                        className="px-4 py-2 bg-indigo-500 text-white font-medium rounded-lg shadow hover:bg-indigo-600 transition duration-200"
+                                        onClick={() => setIsEditingReverseAWB(true)}
+                                    >
+                                        Edit
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Forward Pickup */}
+                        <div className="mt-6">
+                            <strong className="text-gray-700">Forward Shipping AWB:</strong>
+                            {isForwardAWB ? (
+                                <div className="flex items-center space-x-4 mt-3">
+                                    <textarea
+                                        rows={3}
+                                        className="border w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        value={forwardAwbValue}
+                                        onChange={(e) => setForwardAwbValue(e.target.value)}
+                                    />
+                                    <button
+                                        className="px-4 py-2 bg-green-500 text-white font-medium rounded-lg shadow hover:bg-green-600 transition duration-200"
+                                        onClick={saveForwardPickup}
+                                    >
+                                        Save
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="flex items-center justify-between mt-3">
+                                    <p className="text-gray-600">{ticket.forwardShippingAWB || "N/A"}</p>
+                                    <button
+                                        className="px-4 py-2 bg-indigo-500 text-white font-medium rounded-lg shadow hover:bg-indigo-600 transition duration-200"
+                                        onClick={() => setIsForwardAWB(true)}
+                                    >
+                                        Edit
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </>
+                )}
+
+                {/* Resolve Ticket */}
+                <div className="flex justify-center mt-8">
+                    {isResolving ? (
+                        <div className="space-y-4 w-full">
+                            <textarea
+                                className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                rows={4}
+                                placeholder="Enter your resolution comment here"
+                                value={resolveComment}
+                                onChange={(e) => setResolveComment(e.target.value)}
+                            />
+                            <button
+                                onClick={resolveTicket}
+                                className="px-6 py-2 bg-green-500 text-white font-medium rounded-lg shadow hover:bg-green-600 transition duration-200"
+                            >
+                                Submit
+                            </button>
+                        </div>
+                    ) : (
+                        <button
+                            onClick={() => setIsResolving(true)}
+                            className="px-6 py-2 bg-green-500 text-white font-medium rounded-lg shadow hover:bg-green-600 transition duration-200"
+                        >
+                            Resolve Ticket
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            <div className="w-1/4 md:w-3/10 p-4 border-2 border-gray-300 max-h-[650px] overflow-y-scroll">
+                <h2 className="text-xl font-bold mb-4">Comments</h2>
+                <div className="space-y-4">
+                    {comments.map((comment, index) => (
+                        <div
+                            key={index}
+                            className="p-4 bg-gray-100 rounded-md shadow-sm flex flex-col relative z-0"
+                            style={{ overflow: "hidden" }}
+                        >
+                            <div className="text-sm text-gray-600">
+                                <strong>{comment.commentedBy}</strong> at{" "}
+                                {new Date(comment.commentedAt).toLocaleString()}
+                            </div>
+                            <div className="text-gray-800 break-words overflow-wrap max-w-96">
+                                {comment.comment}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+                {/* Add New Comment */}
+                <div className="mt-6">
+                    <textarea
+                        value={newComment}
+                        onChange={(e) => setNewComment(e.target.value)}
+                        rows={4}
+                        className="w-full p-2 border rounded-md"
+                        placeholder="Add a new comment..."
+                    ></textarea>
+                    <button
+                        onClick={handleAddComment}
+                        className="mt-2 px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                    >
+                        Post Comment
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+export default TicketPage;
