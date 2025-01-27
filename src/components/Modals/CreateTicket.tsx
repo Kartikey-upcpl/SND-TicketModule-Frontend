@@ -15,12 +15,17 @@ interface Props {
     onClose: () => void;
     onCreate: (data: TicketFormData) => void;
 }
-
+interface assigneesType {
+    count: number;
+    users: UserType[]; // Fix: users is an array of UserType
+}
 const TicketModal = ({ isOpen, onClose, onCreate }: Props) => {
     const { user } = useUser();
     const [formData, setFormData] = useState<TicketFormData>({
         orderId: "",
         customer: '',
+        mobileNo: '',
+        email: '',
         productName: [],
         orderDate: "",
         issue: '',
@@ -33,7 +38,8 @@ const TicketModal = ({ isOpen, onClose, onCreate }: Props) => {
     });
     const priorities = ['Low', 'Medium', 'High'];
     const issues = ['Replacement Pickup', 'Missing', 'Part Replacement', "Compensation"];
-    const [assignees, setAssignees] = useState<UserType[]>([]);
+    const [assignees, setAssignees] = useState<assigneesType>();
+    console.log("ass", assignees)
     const [products, setProducts] = useState<string[]>([]); // List of product names
     const [selectedProducts, setSelectedProducts] = useState<string[]>([]); // Selected products
     const [uploadedMediaUrls, setUploadedMediaUrls] = useState<string[]>([]);
@@ -107,6 +113,8 @@ const TicketModal = ({ isOpen, onClose, onCreate }: Props) => {
             setFormData((prev) => ({
                 ...prev,
                 customer: data.billing?.first_name || '',
+                mobileNo: data.billing?.phone || '',
+                email: data.billing?.email || '',
                 orderDate: data.date_created?.slice(0, 10) || '',
             }));
         } catch (error: any) {
@@ -158,7 +166,22 @@ const TicketModal = ({ isOpen, onClose, onCreate }: Props) => {
                         onChange={handleChange}
                         className="w-full p-2 border rounded"
                     />
-
+                    <input
+                        type="text"
+                        name="mobileNo"
+                        placeholder="Mobile Number"
+                        value={formData.mobileNo} // Sync with formData
+                        onChange={handleChange}
+                        className="w-full p-2 border rounded"
+                    />
+                    <input
+                        type="text"
+                        name="email"
+                        placeholder="E-Mail"
+                        value={formData.email} // Sync with formData
+                        onChange={handleChange}
+                        className="w-full p-2 border rounded"
+                    />
                     {products.length > 0 && (
                         <div className="mb-4">
                             <h3 className="text-lg font-semibold">Products</h3>
@@ -240,7 +263,7 @@ const TicketModal = ({ isOpen, onClose, onCreate }: Props) => {
                         className="w-full p-2 border rounded"
                     >
                         <option value="">Assign To</option>
-                        {assignees.map((assignee) => (
+                        {assignees?.users?.map((assignee) => (
                             <option key={assignee._id} value={assignee?.username}>{assignee?.username}</option>
                         ))}
                     </select>
@@ -254,7 +277,7 @@ const TicketModal = ({ isOpen, onClose, onCreate }: Props) => {
                     </button>
                     <button
                         onClick={handleSubmit}
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        className="px-4 py-2 bg-[#0CAF60] text-white rounded hover:bg-[#258255]"
                     >
                         Create
                     </button>

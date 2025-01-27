@@ -181,11 +181,27 @@ const TicketPage: React.FC = () => {
     function getStatusColor(status: string): string {
         switch (status) {
             case "In-Progress":
-                return "bg-yellow-100 text-yellow-700";
+                return "bg-[#3EC9D6] text-white";
             case "Closed":
-                return "bg-red-100 text-red-700";
+                return "bg-[#0CAF60] text-white";
             case "Hold":
-                return "bg-blue-100 text-blue-700";
+                return "bg-[#6C757D] text-white";
+            default:
+                return "bg-gray-100 text-gray-700";
+        }
+    }
+
+
+    function getIssueColor(issue: string): string {
+        switch (issue) {
+            case "Missing":
+                return "bg-[#f73208] text-white";
+            case "Compensation":
+                return "bg-[#AC290D] text-white";
+            case "Replacement Pickup":
+                return "bg-[#1b19a4] text-white";
+            case "Part Replacement":
+                return "bg-[#a8159c] text-white";
             default:
                 return "bg-gray-100 text-gray-700";
         }
@@ -242,19 +258,21 @@ const TicketPage: React.FC = () => {
     if (!ticket) return <p>No ticket found.</p>;
 
     return (
-        <div className="flex p-6 mx-auto bg-white shadow-md rounded-md max-w-full">
+        <div className="sm:flex p-6 mx-auto bg-white shadow-md rounded-md max-w-full">
             <div className="w-3/4 md:w-7/10 p-6 bg-white  rounded-lg">
-                <h1 className="text-4xl font-extrabold text-center mb-8 text-indigo-600">🎫 Ticket Details</h1>
-
-                <div className="flex justify-between items-center mb-6">
+                <h1 className="text-4xl font-extrabold text-center mb-8 text-[#0CAF60] flex items-center justify-center">
+                    🎫 Ticket Details
+                </h1>
+                <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
                     <p className="text-lg font-semibold">
-                        <span className="text-gray-600">Ticket ID:</span> <span className="text-indigo-700">{ticket.ticketId}</span>
+                        <span className="text-gray-600">Ticket ID:</span>
+                        <span className="text-[#0CAF60]">{ticket.ticketId}</span>
                     </p>
                     <button
                         onClick={() => setIsModalOpen(true)}
-                        className="px-4 py-2 bg-indigo-500 text-white font-medium rounded-lg shadow hover:bg-indigo-600 transition duration-200"
+                        className="px-4 py-2 bg-[#0CAF60] text-white font-medium rounded-lg shadow hover:bg-[#258758] transition duration-200"
                     >
-                        Update Ticket
+                        View Details
                     </button>
                     <UpdateTicketStatus
                         isOpen={isModalOpen}
@@ -265,31 +283,34 @@ const TicketPage: React.FC = () => {
                 </div>
 
                 {/* Ticket Details */}
-                <div className="space-y-4 mb-6">
-                    <p>
+                <div className="space-y-6 mb-8">
+                    <div>
                         <strong className="text-gray-700">Customer:</strong> {ticket.customer}
-                    </p>
-                    <p>
+                    </div>
+                    <div>
                         <strong className="text-gray-700">Status:</strong>{" "}
-                        <span className={`px-2 py-1 rounded-full ${getStatusColor(ticket.status)}`}>
+                        <span className={`p-2 text-sm font-medium rounded ${getStatusColor(ticket.status)}`}>
                             {ticket.status.toUpperCase()}
                         </span>
-                    </p>
-                    <p>
-                        <strong className="text-gray-700">Issue:</strong> {ticket.issue}
-                    </p>
+                    </div>
+                    <div>
+                        <strong className="text-gray-700">Issue:</strong>
+                        <span className={`p-2 text-sm font-medium rounded ${getIssueColor(ticket?.issue)}`}>
+                            {ticket.issue}
+                        </span>
+                    </div>
                     <div>
                         <strong className="text-gray-700">Description:</strong>
                         {isEditingDescription ? (
                             <div className="flex items-center space-x-4 mt-3">
                                 <textarea
                                     rows={3}
-                                    className="border w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                    className="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0CAF60]"
                                     value={updatedDescription}
                                     onChange={(e) => setUpdatedDescription(e.target.value)}
                                 />
                                 <button
-                                    className="px-4 py-2 bg-green-500 text-white font-medium rounded-lg shadow hover:bg-green-600 transition duration-200"
+                                    className="p-2 hover:bg-[#0CAF60] hover:text-white bg-transparent text-[#0CAF60] border border-[#0CAF60] font-medium rounded-lg shadow  transition duration-200"
                                     onClick={handleUpdateDescription}
                                 >
                                     Save
@@ -297,9 +318,11 @@ const TicketPage: React.FC = () => {
                             </div>
                         ) : (
                             <div className="flex items-center justify-between mt-3">
-                                <p className="text-gray-600">{ticket.description || "N/A"}</p>
+                                <div className="text-gray-600 max-w-full break-words overflow-hidden">
+                                    {ticket.description || "N/A"}
+                                </div>
                                 <button
-                                    className="px-4 py-2 bg-indigo-500 text-white font-medium rounded-lg shadow hover:bg-indigo-600 transition duration-200"
+                                    className="p-2 hover:bg-[#0CAF60] hover:text-white bg-transparent text-[#0CAF60] border border-[#0CAF60] font-medium rounded-lg shadow  transition duration-200"
                                     onClick={() => setIsEditingDescription(true)}
                                 >
                                     Edit
@@ -308,7 +331,6 @@ const TicketPage: React.FC = () => {
                         )}
                     </div>
                 </div>
-
                 {/* Uploaded Media */}
                 <div className="mb-6">
                     <strong className="text-gray-700">Uploaded Media:</strong>
@@ -393,7 +415,9 @@ const TicketPage: React.FC = () => {
                                 </div>
                             ) : (
                                 <div className="flex items-center justify-between mt-3">
-                                    <p className="text-gray-600">{ticket.reversePickupAWB || "N/A"}</p>
+                                    <div className="text-gray-600 max-w-96 break-words overflow-hidden">
+                                        {ticket.reversePickupAWB || "N/A"}
+                                    </div>
                                     <button
                                         className="px-4 py-2 bg-indigo-500 text-white font-medium rounded-lg shadow hover:bg-indigo-600 transition duration-200"
                                         onClick={() => setIsEditingReverseAWB(true)}
@@ -424,7 +448,10 @@ const TicketPage: React.FC = () => {
                                 </div>
                             ) : (
                                 <div className="flex items-center justify-between mt-3">
-                                    <p className="text-gray-600">{ticket.forwardShippingAWB || "N/A"}</p>
+                                    <div className="text-gray-600 max-w-96 break-words overflow-hidden">
+                                        {ticket.forwardShippingAWB || "N/A"}
+                                    </div>
+
                                     <button
                                         className="px-4 py-2 bg-indigo-500 text-white font-medium rounded-lg shadow hover:bg-indigo-600 transition duration-200"
                                         onClick={() => setIsForwardAWB(true)}
@@ -502,7 +529,7 @@ const TicketPage: React.FC = () => {
                     </button>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

@@ -6,6 +6,7 @@ interface User {
     username: string;
     email: string;
     fullname: string
+    role: string
 }
 
 interface UserContextType {

@@ -12,7 +12,7 @@ const PriorityTickets = () => {
     const columns = [
         { header: 'Customer', accessor: 'customer' },
         { header: 'Issue', accessor: 'issue' },
-        { header: 'Description', accessor: 'description' },
+        // { header: 'Description', accessor: 'description' },
         { header: 'Status', accessor: 'status' },
         { header: 'Priority', accessor: 'priority' },
         { header: 'Assigned To', accessor: 'assignTo' },

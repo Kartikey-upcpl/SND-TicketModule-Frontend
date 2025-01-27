@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { signup } from '@/api/action/authAction';
 import { toast, ToastContainer } from 'react-toastify';
+import { useRouter } from 'next/navigation';
 
 const SignupPage = () => {
     const [formData, setFormData] = useState({
@@ -9,11 +10,13 @@ const SignupPage = () => {
         fullname: "",
         email: "",
         password: "",
+        role: ""
     });
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
+    const router = useRouter()
 
     const handleSubmit = async (e: any) => {
         e.preventDefault()
@@ -25,7 +28,9 @@ const SignupPage = () => {
                 fullname: "",
                 email: "",
                 password: "",
+                role: ""
             });
+            router.push("/")
         } catch (error: any) {
             toast.error(error.message || 'Signup failed');
         }
@@ -68,7 +73,11 @@ const SignupPage = () => {
                         value={formData.password}
                         onChange={handleChange}
                     />
-                    <select className='w-full p-2 border rounded' name="role" id="">
+                    <select
+                        className='w-full p-2 border rounded'
+                        name="role"
+                        value={formData.role}
+                        onChange={handleChange}>
                         <option value="Agent">Select User Role</option>
                         <option value="Agent">Agent</option>
                         <option value="Admin">Admin</option>

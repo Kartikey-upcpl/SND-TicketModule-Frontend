@@ -34,7 +34,7 @@ export default function ClientLayout({
                 <div className="w-1/6">
                     <Sidebar />
                 </div>
-                <div className="pt-16 w-10/12 h-screen  overflow-y-scroll">{children}</div>
+                <div className="pt-16 w-10/12 h-screen">{children}</div>
             </div>
         </div>
     );

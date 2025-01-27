@@ -1,6 +1,8 @@
 export interface TicketFormData {
     ticketId?: string; // Add ticketId as an optional string
     orderId: string;
+    mobileNo: string;
+    email: string;
     customer: string;
     productName: string[]; // Change from string to string[]
     orderDate: string;

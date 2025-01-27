@@ -82,7 +82,7 @@ export default function Header() {
     };
 
     return (
-        <div className="bg-[#f1eded] text-black p-4 fixed top-0 left-0 w-full shadow-md flex items-center justify-between z-10">
+        <div className="bg-[#fdfefd] text-black p-4 fixed top-0 left-0 w-full  flex items-center justify-between z-10">
             {/* Left Section - Logo */}
             <div className="flex items-center space-x-4">
                 <div className="w-32">
@@ -106,7 +106,7 @@ export default function Header() {
                         }`}
                 >
                     <p className="cursor-default border-b-2 ">
-                        Hi, {userDetails?.fullname}
+                        Hi, {userDetails?.fullname.toUpperCase()}
                     </p>
                     <button
                         onClick={handleLogout}

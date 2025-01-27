@@ -80,13 +80,13 @@ const UpdateTicketStatus = ({ isOpen, onClose, ticketId, username }: Props) => {
                 <div className="flex justify-end mt-4 space-x-2">
                     <button
                         onClick={onClose}
-                        className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+                        className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
                     >
                         Cancel
                     </button>
                     <button
                         onClick={handleSubmit}
-                        className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                        className="px-4 py-2 bg-[#0CAF60] text-white rounded hover:bg-[#258255]"
                     >
                         Update
                     </button>
