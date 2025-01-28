@@ -18,6 +18,7 @@ interface assigneesType {
 const AllTickets = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [tickets, setTickets] = useState<TicketFormData[]>([]);
+    console.log("ticket", tickets)
     const [error, setError] = useState<string | null>(null);
     const { users, isLoading, isError } = useUsers();
     const [assignees, setAssignees] = useState<assigneesType>();
