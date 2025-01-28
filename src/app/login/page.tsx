@@ -22,15 +22,15 @@ const LoginForm = ({ onClose }: any) => {
             if (authToken) {
                 // Set the authToken in a cookie
                 Cookies.set('authToken', authToken, {
-                    expires: 7,        // Cookie expires in 7 days
-                    secure: false,     // Set to true only for HTTPS
+                    expires: 1,        // Cookie expires in 7 days
+                    secure: process.env.NODE_ENV === 'production', // Enable secure in production
                     path: '/',         // Make the cookie available site-wide
                 });
 
                 // Set the user object in a cookie
                 Cookies.set('user', JSON.stringify(user), {
-                    expires: 7,        // Cookie expires in 7 days
-                    secure: false,     // Set to true only for HTTPS
+                    expires: 1,        // Cookie expires in 7 days
+                    secure: process.env.NODE_ENV === 'production', // Enable secure in production
                     path: '/',         // Make the cookie available site-wide
                 });
                 setUser(user);
