@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { fetchUploadedMediaAction } from '@/api/action/mediaAction';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const ImageGallery: React.FC = () => {
     const [images, setImages] = useState<string[]>([]);
@@ -66,10 +67,12 @@ const ImageGallery: React.FC = () => {
                                 rel="noopener noreferrer"
                                 className="w-full h-auto object-cover p-5"
                             >
-                                <img
+                                <Image
+                                    width={500}
+                                    height={500}
                                     src={image.trim()}
                                     alt={`Uploaded image ${index + 1}`}
-                                    className="w-full h-auto object-cover "
+                                    className=""
                                 />
                             </Link>
                         ) : isVideo ? (

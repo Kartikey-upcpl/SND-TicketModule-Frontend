@@ -14,3 +14,8 @@ export interface TicketFormData {
     createdby: string;
     imageProofLink: string[];
 }
+
+export interface UploadMediaProps {
+    onUpload: (urls: string[]) => void; // Callback to pass uploaded URLs to parent
+    ticketId: string; // Ticket ID to associate with uploaded files
+}

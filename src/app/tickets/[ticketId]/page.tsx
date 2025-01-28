@@ -3,11 +3,11 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import UpdateTicketStatus from "@/components/Modals/UpdateTicketStatus";
 import { toast } from "react-toastify";
-import Image from "next/image";
-import UploadMedia from "@/app/upload-media/page";
+import UploadMedia from "@/components/upload-media/page";
 import { handleImageUploadForTicket } from "@/api/action/mediaAction";
 import { updateTicketAction } from "@/api/action/ticketAction";
 import { useUser } from "@/context/UserContext";
+import Image from "next/image";
 
 const TicketPage: React.FC = () => {
     const { ticketId } = useParams(); // Get ticketId from the URL
@@ -156,7 +156,7 @@ const TicketPage: React.FC = () => {
             toast.success("Images uploaded successfully!");
             setTicket((prev: any) => ({
                 ...prev,
-                imageProofLink: result.data.imageProofLink,
+                imageProofLink: [...(prev.imageProofLink || []), ...urls],
             }));
         } else {
             toast.error(result.message);
@@ -349,10 +349,11 @@ const TicketPage: React.FC = () => {
                                         rel="noopener noreferrer"
                                         className="block w-32 h-32 rounded-lg shadow-md overflow-hidden border"
                                     >
-                                        <img
+                                        <Image
                                             src={link.trim()}
                                             alt={`Uploaded image ${index + 1}`}
-                                            className="w-full h-full object-cover"
+                                            width={500}
+                                            height={500}
                                         />
                                     </a>
                                 ) : isVideo ? (

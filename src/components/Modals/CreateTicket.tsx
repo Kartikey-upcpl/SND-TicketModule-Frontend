@@ -7,7 +7,7 @@ import axios from "axios"
 import { fetchUserAction } from '@/api/action/userAction';
 import { UserType } from '@/types/userType';
 import { useUser } from '@/context/UserContext';
-import UploadMedia from '@/app/upload-media/page';
+import UploadMedia from '../upload-media/page';
 
 
 interface Props {

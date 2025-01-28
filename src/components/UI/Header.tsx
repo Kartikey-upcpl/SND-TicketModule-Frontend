@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import Cookies from 'js-cookie';
 import { UserType } from "@/types/userType";
 import { useUser } from "@/context/UserContext";
+import Image from "next/image";
 
 
 export default function Header() {
@@ -86,7 +87,12 @@ export default function Header() {
             {/* Left Section - Logo */}
             <div className="flex items-center space-x-4">
                 <div className="w-32">
-                    <img src="/assets/snd-logo.png" alt="logo" className="h-8" />
+                    <Image
+                        src="/assets/snd-logo.png"
+                        alt="logo"
+                        width={500}
+                        height={500}
+                    />
                 </div>
                 {/* Only show "Create A User" button if user is Admin */}
             </div>

@@ -6,6 +6,7 @@ import { login } from "@/api/action/authAction";
 import Cookies from 'js-cookie';
 import "react-toastify/dist/ReactToastify.css"; // Ensure this is imported
 import { useUser } from "@/context/UserContext";
+import Image from "next/image";
 
 const LoginForm = ({ onClose }: any) => {
     const [userName, setUserName] = useState("");
@@ -49,7 +50,12 @@ const LoginForm = ({ onClose }: any) => {
             <div className="bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCB045] sm:w-4/6"></div>
             <div className="bg-white sm:w-4/12	py-32 p-20 justify-center  rounded-lg shadow-lg">
                 <div className="flex justify-center">
-                    <img src="/assets/snd-logo.png" alt="logo" className="h-20" />
+                    <Image
+                        src="/assets/snd-logo.png"
+                        width={500}
+                        height={500}
+                        alt="logo"
+                    />
                 </div>
                 <p className="text-3xl font-semibold text-center py-10">
                     Ticket Dashboard

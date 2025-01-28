@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { signup } from '@/api/action/authAction';
 import { toast, ToastContainer } from 'react-toastify';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 const SignupPage = () => {
     const [formData, setFormData] = useState({
@@ -40,7 +41,12 @@ const SignupPage = () => {
         <div className="flex justify-center items-center p-4 sm:p-8 mt-10 w-full">
             <div className="bg-red-300 w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-md xl:max-w-md justify-center p-6 sm:p-8 md:p-10 lg:p-12 rounded-lg shadow-lg">
                 <div className="flex justify-center mb-10">
-                    <img src="/assets/snd-logo.png" alt="logo" className="h-20 " />
+                    <Image
+                        src="/assets/snd-logo.png"
+                        width={500}
+                        height={500}
+                        alt="logo"
+                    />
                 </div>
                 <form className='w-full mt-2 space-y-2' onSubmit={handleSubmit}>
                     <input

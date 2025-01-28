@@ -81,6 +81,7 @@ const AllTickets = () => {
             setError(error.message);
         }
     };
+
     useEffect(() => {
         fetchTickets();
     }, [filters]);

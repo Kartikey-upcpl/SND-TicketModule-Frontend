@@ -2,11 +2,10 @@
 import React, { useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { UploadMediaProps } from "@/types/ticketType";
+import Image from "next/image";
 
-interface UploadMediaProps {
-    onUpload: (urls: string[]) => void; // Callback to pass uploaded URLs to parent
-    ticketId: string; // Ticket ID to associate with uploaded files
-}
+
 
 const UploadMedia: React.FC<UploadMediaProps> = ({ onUpload, ticketId }) => {
 
@@ -26,10 +25,11 @@ const UploadMedia: React.FC<UploadMediaProps> = ({ onUpload, ticketId }) => {
             return;
         }
         const formData = new FormData();
-        formData.append("ticketId", ticketId); // Add the ticketId
+        formData.append("ticketId", ticketId); // Use ticketId for association
         files.forEach((file) => {
             formData.append("media", file);
         });
+
         try {
             const response = await fetch("http://localhost:3000/api/media/upload", {
                 method: "POST",
@@ -50,6 +50,7 @@ const UploadMedia: React.FC<UploadMediaProps> = ({ onUpload, ticketId }) => {
             setUploadStatus(`Upload failed: ${error.message}`);
         }
     };
+
 
     // const copyLink = (url: string) => {
     //     navigator.clipboard.writeText(url);
@@ -80,7 +81,11 @@ const UploadMedia: React.FC<UploadMediaProps> = ({ onUpload, ticketId }) => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                         {uploadedUrls.map((url, index) => (
                             <div key={index} className="border p-2 rounded">
-                                <img src={url} alt={`Uploaded ${index}`} className="max-w-full	" />
+                                <Image
+                                    src={url}
+                                    alt={`Uploaded ${index}`} width={500}
+                                    height={500}
+                                />
                                 {/* <p className="mt-2 text-gray-600">{url}</p> */}
                                 {/* <button
                                     className="mt-2 p-2 border bg-red-300"
