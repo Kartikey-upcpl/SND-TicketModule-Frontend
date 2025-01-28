@@ -27,7 +27,7 @@ export async function httpClient({
             }, {} as Record<string, string>)
         ).toString();
         const url = `${API_BASE_URL}/api/${endpoint}${queryString ? `?${queryString}` : ''}`;
-        console.log("URL", url)
+        // console.log("URL", url)
         const options: RequestInit = {
             method,
             headers: {
@@ -36,11 +36,11 @@ export async function httpClient({
             },
             body: body ? JSON.stringify(body) : null, // Serialize body to JSON
         };
-        console.log('Serialized Body:', body);
+        // console.log('Serialized Body:', body);
 
 
         const response = await fetch(url, options);
-        console.log('response', response);
+        // console.log('response', response);
 
 
         if (!response.ok) {

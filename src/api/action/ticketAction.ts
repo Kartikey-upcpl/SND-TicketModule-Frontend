@@ -110,3 +110,110 @@ export async function ticketSummaryAction() {
         return { status: 'error', message: error.message };
     }
 }
+
+export async function ticketById(ticketId: string) {
+    try {
+        const res = await httpClient({
+            endpoint: `tickets/${ticketId}`,
+            method: 'GET',
+        })
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || 'Failed to fetch ticket');
+        }
+        return await res.json(); // Return the ticket
+
+    } catch (error: any) {
+        return { status: 'error', message: error.message };
+    }
+}
+
+export async function commentsByTicketId(ticketId: string) {
+    try {
+        const res = await httpClient({
+            endpoint: `tickets/comments/${ticketId}`,
+            method: 'GET',
+        })
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || 'Failed to fetch ticket');
+        }
+        return await res.json(); // Return the ticket
+
+    } catch (error: any) {
+        return { status: 'error', message: error.message };
+    }
+}
+
+export async function updateReversePickup(ticketId: string, reverseAwbValue: string, fullname: string) {
+    try {
+        const res = await httpClient({
+            endpoint: `tickets/update-reverse-AWB/${ticketId}`,
+            method: 'PUT',
+            body: { reversePickupAWB: reverseAwbValue, updatedBy: fullname }
+        })
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || 'Failed to fetch ticket');
+        }
+        return await res.json(); // Return the ticket
+
+    } catch (error: any) {
+        return { status: 'error', message: error.message };
+    }
+}
+
+export async function updateForwardPickup(ticketId: string, forwardAwbValue: string, fullname: string) {
+    try {
+        const res = await httpClient({
+            endpoint: `tickets/update-forward-AWB/${ticketId}`,
+            method: 'PUT',
+            body: { forwardShippingAWB: forwardAwbValue, updatedBy: fullname }
+        })
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || 'Failed to fetch ticket');
+        }
+        return await res.json(); // Return the ticket
+
+    } catch (error: any) {
+        return { status: 'error', message: error.message };
+    }
+}
+
+export async function resolveTicketAction(ticketId: string, resolveComment: string, fullname: string) {
+    try {
+        const res = await httpClient({
+            endpoint: `tickets/resolve-ticket/${ticketId}`,
+            method: 'PUT',
+            body: { resolveTicketRemark: resolveComment, updatedBy: fullname }
+        })
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || 'Failed to fetch ticket');
+        }
+        return await res.json(); // Return the ticket
+
+    } catch (error: any) {
+        return { status: 'error', message: error.message };
+    }
+}
+
+
+export async function submitComment(ticketId: string, newComment: string, fullname: string) {
+    try {
+        const res = await httpClient({
+            endpoint: `tickets/add-comment/${ticketId}`,
+            method: 'POST',
+            body: { comment: newComment, commentedBy: fullname }
+        })
+        if (!res.ok) {
+            const errorData = await res.json();
+            throw new Error(errorData.message || 'Failed to fetch ticket');
+        }
+        return await res.json(); // Return the ticket
+
+    } catch (error: any) {
+        return { status: 'error', message: error.message };
+    }
+}

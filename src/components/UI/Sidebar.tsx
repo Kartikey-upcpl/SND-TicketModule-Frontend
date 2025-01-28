@@ -26,7 +26,6 @@ const Sidebar = () => {
 
 
 
-    console.log("ticketCounts", ticketCounts)
     // useEffect(() => {
     //     const fetchTicketCounts = async () => {
     //         try {

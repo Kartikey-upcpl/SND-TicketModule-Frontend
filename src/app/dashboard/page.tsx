@@ -12,7 +12,6 @@ interface MaximumFormSubmission {
 const Dashboard = () => {
     const { users } = useUsers();
     const { TicketSummary } = useTicketSummary();
-    console.log("TicketSummary", TicketSummary)
 
 
     // useEffect(() => {

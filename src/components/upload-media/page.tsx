@@ -31,11 +31,10 @@ const UploadMedia: React.FC<UploadMediaProps> = ({ onUpload, ticketId }) => {
         });
 
         try {
-            const response = await fetch("http://localhost:3000/api/media/upload", {
+            const response = await fetch("https://ticket.gosnd.com/api/media/upload", {
                 method: "POST",
                 body: formData,
             });
-
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.message || "Failed to upload media");

@@ -4,10 +4,10 @@ const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'http',
-        hostname: 'localhost',
-        port: '3000', // If running on a different port, update accordingly
-        pathname: '/uploads/**', // Adjust the path to match your images' location
+        protocol: 'http', // Protocol used (http or https)
+        hostname: 'localhost', // Hostname for image source
+        port: '5000', // Replace with the port your server runs on
+        pathname: '/uploads/**', // Match the path where your images are stored
       },
     ],
   },

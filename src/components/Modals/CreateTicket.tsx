@@ -39,7 +39,6 @@ const TicketModal = ({ isOpen, onClose, onCreate }: Props) => {
     const priorities = ['Low', 'Medium', 'High'];
     const issues = ['Replacement Pickup', 'Missing', 'Part Replacement', "Compensation"];
     const [assignees, setAssignees] = useState<assigneesType>();
-    console.log("ass", assignees)
     const [products, setProducts] = useState<string[]>([]); // List of product names
     const [selectedProducts, setSelectedProducts] = useState<string[]>([]); // Selected products
     const [uploadedMediaUrls, setUploadedMediaUrls] = useState<string[]>([]);

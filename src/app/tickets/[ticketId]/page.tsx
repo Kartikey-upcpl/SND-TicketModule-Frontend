@@ -5,16 +5,15 @@ import UpdateTicketStatus from "@/components/Modals/UpdateTicketStatus";
 import { toast } from "react-toastify";
 import UploadMedia from "@/components/upload-media/page";
 import { handleImageUploadForTicket } from "@/api/action/mediaAction";
-import { updateTicketAction } from "@/api/action/ticketAction";
+import { commentsByTicketId, resolveTicketAction, submitComment, ticketById, updateForwardPickup, updateReversePickup, updateTicketAction } from "@/api/action/ticketAction";
 import { useUser } from "@/context/UserContext";
 import Image from "next/image";
 
 const TicketPage: React.FC = () => {
-    const { ticketId } = useParams(); // Get ticketId from the URL
+    const { ticketId } = useParams<{ ticketId: string }>(); // Get ticketId directly from useParams
     const [ticket, setTicket] = useState<any>(null);
     const { user } = useUser();
 
-    console.log("useruseruser", user)
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -34,21 +33,16 @@ const TicketPage: React.FC = () => {
         const fetchTicketAndComments = async () => {
             try {
                 if (!ticketId) throw new Error("No ticketId provided");
-
                 // Fetch ticket details
-                const ticketResponse = await fetch(`http://localhost:3000/api/tickets/${ticketId}`);
-                if (!ticketResponse.ok) throw new Error("Failed to fetch ticket details");
-                const ticketData = await ticketResponse.json();
-                setTicket(ticketData.ticket);
-                setReverseAwbValue(ticketData.ticket?.reversePickupAWB || "");
-                setForwardAwbValue(ticketData.ticket?.forwardShippingAWB || "");
+                const ticketResponse = await ticketById(ticketId)
+                // if (!ticketResponse.ok) throw new Error("Failed to fetch ticket details");
+                setTicket(ticketResponse.ticket);
+                setReverseAwbValue(ticketResponse.ticket?.reversePickupAWB || "");
+                setForwardAwbValue(ticketResponse.ticket?.forwardShippingAWB || "");
 
                 // Fetch comments
-                const commentsResponse = await fetch(`http://localhost:3000/api/tickets/comments/${ticketId}`);
-                console.log("commentsResponse", commentsResponse)
-                if (!commentsResponse.ok) throw new Error("Failed to fetch comments");
-                const commentsData = await commentsResponse.json();
-                setComments(commentsData);
+                const commentsResponse = await commentsByTicketId(ticketId)
+                setComments(commentsResponse);
             } catch (err: any) {
                 console.error("Error loading ticket or comments:", err.message);
                 setError(err.message);
@@ -62,16 +56,7 @@ const TicketPage: React.FC = () => {
 
     const saveReversePickup = async () => {
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/tickets/update-reverse-AWB/${ticket?._id}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ reversePickupAWB: reverseAwbValue, updatedBy: user?.fullname }),
-                }
-            );
+            const response = await updateReversePickup(ticket?._id, reverseAwbValue, user?.fullname || "")
 
             if (!response.ok) {
                 throw new Error("Failed to update Reverse Pickup AWB");
@@ -91,16 +76,7 @@ const TicketPage: React.FC = () => {
 
     const saveForwardPickup = async () => {
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/tickets/update-forward-AWB/${ticket?._id}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ forwardShippingAWB: forwardAwbValue, updatedBy: user?.fullname }),
-                }
-            );
+            const response = await updateForwardPickup(ticket?._id, forwardAwbValue, user?.fullname || "")
 
             if (!response.ok) {
                 throw new Error("Failed to update Forward Shipping AWB");
@@ -124,16 +100,7 @@ const TicketPage: React.FC = () => {
             return;
         }
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/tickets/resolve-ticket/${ticket?._id}`,
-                {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ resolveTicketRemark: resolveComment, updatedBy: user?.fullname }),
-                }
-            );
+            const response = await resolveTicketAction(ticket?._id, resolveComment, user?.fullname || "")
 
             if (!response.ok) {
                 throw new Error("Failed to resolve ticket");
@@ -230,21 +197,10 @@ const TicketPage: React.FC = () => {
             toast.error("Comment cannot be empty.");
             return;
         }
-        console.log("comment", newComment)
         try {
-            const response = await fetch(
-                `http://localhost:3000/api/tickets/add-comment/${ticket?._id}`,
-                {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ comment: newComment, commentedBy: user?.fullname }), // Replace with actual user ID
-                }
-            );
+            const response = await submitComment(ticket?._id, newComment, user?.fullname || "")
 
-            if (!response.ok) throw new Error("Failed to add comment");
-
-            const updatedComments = await response.json();
-            setComments(updatedComments); // Update comments list
+            setComments(response); // Update comments list
             setNewComment(""); // Clear input
             toast.success("Comment added successfully!");
         } catch (err: any) {

@@ -18,13 +18,11 @@ interface assigneesType {
 const AllTickets = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [tickets, setTickets] = useState<TicketFormData[]>([]);
-    console.log("ticket", tickets)
     const [error, setError] = useState<string | null>(null);
     const { users, isLoading, isError } = useUsers();
     const [assignees, setAssignees] = useState<assigneesType>();
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
-    console.log("assignees", assignees)
     const [filters, setFilters] = useState({
         assignTo: "",
         email: "",
@@ -98,7 +96,7 @@ const AllTickets = () => {
     if (isError) return <div>Error fetching users.</div>;
 
     return (
-        <div>
+        <div className='py-2'>
             <div className="bg-white py-4 px-6 flex flex-wrap items-center ">
                 {/* Filters Section */}
                 <div className="space-y-3 sm:space-y-0 sm:space-x-4 flex flex-wrap items-center text-[#293240]">
