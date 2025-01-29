@@ -5,7 +5,11 @@ import { useUser } from '@/context/UserContext';
 import { useTicketSummary } from '@/hooks/useTicketSummary';
 import { usePathname } from "next/navigation"; // Use usePathname for App Router
 
-const Sidebar = () => {
+interface SidebarProps {
+    onClose?: () => void; // Make onClose optional
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     const tabs = [
         { name: "All Tickets", path: "/tickets/all", roles: ["Admin", "Agent"], countKey: "totalCount" },
         { name: "Closed Tickets", path: "/tickets/closed", roles: ["Admin", "Agent"], countKey: "Closed" },
@@ -70,7 +74,7 @@ const Sidebar = () => {
                             return (
 
                                 <li key={tab.path}>
-                                    <Link href={tab.path}>
+                                    <Link href={tab.path} onClick={() => onClose?.()}>
                                         <div
                                             className={`flex justify-between items-center p-3 rounded-md font-semibold ${isActive
                                                 ? "bg-[#0caf60] text-white" // Active styles

@@ -109,11 +109,13 @@ const TicketPage: React.FC = () => {
             toast.success("Ticket resolved successfully!");
             setTicket((prev: any) => ({
                 ...prev,
-                status: "Resolved",
+                status: "Closed",
             }));
-            setIsResolving(false);
         } catch (error: any) {
             toast.error(`Failed to resolve ticket: ${error.message}`);
+        }
+        finally {
+            setIsResolving(false);
         }
     };
 
@@ -214,13 +216,13 @@ const TicketPage: React.FC = () => {
     if (!ticket) return <p>No ticket found.</p>;
 
     return (
-        <div className="sm:flex p-6 mx-auto bg-white shadow-md rounded-md max-w-full">
-            <div className="w-3/4 md:w-7/10 p-6 bg-white  rounded-lg">
-                <h1 className="text-4xl font-extrabold text-center mb-8 text-[#0CAF60] flex items-center justify-center">
+        <div className="sm:flex sm:p-6 mx-auto bg-white shadow-md rounded-md max-w-full">
+            <div className="sm:w-3/4 md:w-7/10 p-6 bg-white  rounded-lg">
+                <h1 className="text-4xl font-semibold text-center mb-8 text-[#0CAF60] flex items-center justify-center">
                     🎫 Ticket Details
                 </h1>
-                <div className="flex flex-col sm:flex-row justify-between items-center mb-8 gap-4">
-                    <p className="text-lg font-semibold">
+                <div className="flex flex-row justify-between items-center mb-8">
+                    <p className="sm:text-lg font-semibold">
                         <span className="text-gray-600">Ticket ID:</span>
                         <span className="text-[#0CAF60]">{ticket.ticketId}</span>
                     </p>
@@ -228,7 +230,7 @@ const TicketPage: React.FC = () => {
                         onClick={() => setIsModalOpen(true)}
                         className="px-4 py-2 bg-[#0CAF60] text-white font-medium rounded-lg shadow hover:bg-[#258758] transition duration-200"
                     >
-                        View Details
+                        Update Details
                     </button>
                     <UpdateTicketStatus
                         isOpen={isModalOpen}
@@ -450,7 +452,7 @@ const TicketPage: React.FC = () => {
                 </div>
             </div>
 
-            <div className="w-1/4 md:w-3/10 p-4 border-2 border-gray-300 max-h-[650px] overflow-y-scroll">
+            <div className="sm:w-1/4 md:w-3/10 p-4 border-2 border-gray-300 max-h-[650px] overflow-y-scroll">
                 <h2 className="text-xl font-bold mb-4">Comments</h2>
                 <div className="space-y-4">
                     {comments.map((comment, index) => (

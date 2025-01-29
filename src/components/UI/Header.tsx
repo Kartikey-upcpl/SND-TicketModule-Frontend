@@ -2,6 +2,8 @@
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useEffect, useRef, useState, useCallback } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import DensityMediumIcon from '@mui/icons-material/DensityMedium';
+import CloseIcon from "@mui/icons-material/Close";
 import { logout } from "@/api/action/authAction";
 import { toast } from "react-toastify";
 import { useRouter } from 'next/navigation';
@@ -9,12 +11,15 @@ import Cookies from 'js-cookie';
 import { UserType } from "@/types/userType";
 import { useUser } from "@/context/UserContext";
 import Image from "next/image";
+import Sidebar from "./Sidebar";
 
 
 export default function Header() {
     const profileRef = useRef<HTMLDivElement>(null);
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [userDetails, setUserDetails] = useState<UserType | null>(null); // Allow null as initial value
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
     const router = useRouter();
     const { setUser } = useUser()
 
@@ -42,6 +47,10 @@ export default function Header() {
             document.removeEventListener("mousedown", handleClickOutside);
         };
     }, [handleClickOutside]);
+
+    const handleSideBar = useCallback(() => {
+        setIsSidebarOpen((prev) => !prev);
+    }, []);
 
     useEffect(() => {
         // Fetch the user object from the cookies
@@ -83,9 +92,35 @@ export default function Header() {
     };
 
     return (
-        <div className="bg-[#fdfefd] text-black p-4 fixed top-0 left-0 w-full  flex items-center justify-between z-10">
-            {/* Left Section - Logo */}
-            <div className="flex items-center space-x-4">
+        <div>
+            {/* Sidebar Overlay for Mobile */}
+            {isSidebarOpen && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 z-40 sm:hidden"
+                    onClick={() => setIsSidebarOpen(false)}
+                ></div>
+            )}
+
+            {/* Sidebar as Drawer on Mobile */}
+            <div className={`fixed top-0 left-0 h-full bg-white shadow-lg transition-transform transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} w-4/5 sm:w-64 z-50 sm:hidden`}>
+                <div className="p-4 flex justify-between items-center border-b">
+                    <h2 className="text-lg font-bold text-gray-700">Menu</h2>
+                    <button onClick={() => setIsSidebarOpen(false)} className="focus:outline-none">
+                        <CloseIcon sx={{ fontSize: 32, color: "gray" }} />
+                    </button>
+                </div>
+                <Sidebar onClose={() => setIsSidebarOpen(false)} />
+            </div>
+
+            <div className="bg-[#fdfefd] text-black p-4 fixed top-0 left-0 w-full flex items-center justify-between z-10">
+                {/* Sidebar Toggle Button (Only on Mobile) */}
+                <div className="sm:hidden">
+                    <button onClick={handleSideBar} className="focus:outline-none">
+                        <DensityMediumIcon sx={{ color: "black", fontSize: 32 }} />
+                    </button>
+                </div>
+
+                {/* Logo */}
                 <div className="w-32">
                     <Image
                         src="/assets/snd-logo.png"
@@ -94,32 +129,26 @@ export default function Header() {
                         height={500}
                     />
                 </div>
-                {/* Only show "Create A User" button if user is Admin */}
-            </div>
-            {/* Center Section - Refund Module Text */}
-            <div className="flex justify-center w-full absolute inset-x-0 text-center">
-                <div className="text-2xl italic font-bold text-[#394b5d]">
-                    Ticket Module
-                </div>
-            </div>
-            <div ref={profileRef} className="relative">
-                <button onClick={handleProfileButton} className="focus:outline-none">
-                    <AccountCircleIcon sx={{ color: "black", fontSize: 32 }} />
-                    <KeyboardArrowDownIcon />
-                </button>
-                <div
-                    className={`absolute right-0 mt-2 bg-[#d72f59] text-white px-4 py-2  rounded shadow-lg ${dropdownOpen ? "block" : "hidden"
-                        }`}
-                >
-                    <p className="cursor-default border-b-2 ">
-                        Hi, {userDetails?.fullname.toUpperCase()}
-                    </p>
-                    <button
-                        onClick={handleLogout}
-                        className="hover:text-[#f1eded] cursor-pointer w-full text-left"
-                    >
-                        Logout
+
+                {/* User Profile Dropdown */}
+                <div ref={profileRef} className="relative">
+                    <button onClick={handleProfileButton} className="focus:outline-none flex items-center">
+                        <AccountCircleIcon sx={{ color: "black", fontSize: 32 }} />
+                        <KeyboardArrowDownIcon />
                     </button>
+                    <div
+                        className={`absolute right-0 mt-2 bg-[#d72f59] text-white px-4 py-2 rounded shadow-lg ${dropdownOpen ? "block" : "hidden"}`}
+                    >
+                        <p className="cursor-default border-b-2">
+                            Hi, {userDetails?.fullname.toUpperCase()}
+                        </p>
+                        <button
+                            onClick={handleLogout}
+                            className="hover:text-[#f1eded] cursor-pointer w-full text-left"
+                        >
+                            Logout
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

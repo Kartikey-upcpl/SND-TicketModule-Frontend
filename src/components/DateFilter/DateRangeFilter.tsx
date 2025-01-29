@@ -18,7 +18,7 @@ const DateRangeFilter: React.FC<DateRangePickerProps> = ({
     onEndDateChange,
 }) => {
     return (
-        <div className="flex w-72 space-x-2">
+        <div className="flex sm:w-72 space-x-2">
             <DatePicker
                 selected={startDate}
                 onChange={(date: Date | null) => onStartDateChange(date)}

@@ -28,13 +28,18 @@ export default function ClientLayout({
 
 
     return (
-        <div className="">
+        <div className="min-h-screen">
             <Header />
             <div className="flex">
-                <div className="w-1/6">
+                {/* Sidebar: Always visible on large screens, hidden on small screens */}
+                <div className="w-1/6 lg:w-1/5 hidden sm:block">
                     <Sidebar />
                 </div>
-                <div className="pt-16 w-10/12 h-screen">{children}</div>
+
+                {/* Main Content: Full width on mobile, 5/6 on larger screens */}
+                <div className="pt-16 sm:w-5/6 w-full h-screen overflow-y-auto">
+                    {children}
+                </div>
             </div>
         </div>
     );

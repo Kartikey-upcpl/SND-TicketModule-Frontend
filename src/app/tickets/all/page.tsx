@@ -97,14 +97,14 @@ const AllTickets = () => {
 
     return (
         <div className='py-2'>
-            <div className="bg-white py-4 px-6 flex flex-wrap items-center ">
+            <div className="bg-white py-4 px-6 sm:flex sm:flex-wrap items-center ">
                 {/* Filters Section */}
-                <div className="space-y-3 sm:space-y-0 sm:space-x-4 flex flex-wrap items-center text-[#293240]">
+                <div className="space-y-3 sm:space-y-0 sm:space-x-4 sm:flex sm:flex-wrap items-center text-[#293240]">
                     <select
                         name="assignTo"
                         value={filters.assignTo}
                         onChange={(e) => setFilters({ ...filters, assignTo: e.target.value })}
-                        className="w-40 h-10 px-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0caf60] text-[#293240]"
+                        className="sm:w-40 w-full h-10 px-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0caf60] text-[#293240]"
                     >
                         <option value="">Select Assigned User</option>
                         {assignees?.users?.map((user: UserType) => (
@@ -118,21 +118,21 @@ const AllTickets = () => {
                         placeholder="Email"
                         value={filters.email}
                         onChange={(e) => setFilters({ ...filters, email: e.target.value })}
-                        className="w-40 h-10 px-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0caf60] text-[#293240]"
+                        className="sm:w-40 w-full h-10 px-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0caf60] text-[#293240]"
                     />
                     <input
                         type="text"
                         placeholder="Mobile No"
                         value={filters.mobileNo}
                         onChange={(e) => setFilters({ ...filters, mobileNo: e.target.value })}
-                        className="w-40 h-10 px-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0caf60] text-[#293240]"
+                        className="sm:w-40 w-full h-10 px-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0caf60] text-[#293240]"
                     />
                     <input
                         type="text"
                         placeholder="Order ID"
                         value={filters.orderId}
                         onChange={(e) => setFilters({ ...filters, orderId: e.target.value })}
-                        className="w-40 h-10 px-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0caf60] text-[#293240]"
+                        className="sm:w-40 w-full h-10 px-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0caf60] text-[#293240]"
                     />
                     <DateRangeFilter
                         startDate={startDate}
@@ -146,7 +146,7 @@ const AllTickets = () => {
                             setFilters((prev) => ({ ...prev, endDate: formatDate(date) }));
                         }}
                     />
-                    <div className="absolute right-10">
+                    <div className="relative sm:left-36">
                         <Tooltip title="Create Ticket" arrow>
                             <button
                                 onClick={() => setIsModalOpen(true)}
