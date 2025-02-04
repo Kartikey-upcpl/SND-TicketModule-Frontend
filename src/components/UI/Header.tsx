@@ -102,7 +102,7 @@ export default function Header() {
             )}
 
             {/* Sidebar as Drawer on Mobile */}
-            <div className={`fixed top-0 left-0 h-full bg-white shadow-lg transition-transform transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} w-4/5 sm:w-64 z-50 sm:hidden`}>
+            <div className={`fixed top-0 left-0 h-full bg-white shadow-lg transition-transform transform ${isSidebarOpen ? "translate-x-0" : "-translate-x-full"} w-4/5  z-50 sm:hidden`}>
                 <div className="p-4 flex justify-between items-center border-b">
                     <h2 className="text-lg font-bold text-gray-700">Menu</h2>
                     <button onClick={() => setIsSidebarOpen(false)} className="focus:outline-none">

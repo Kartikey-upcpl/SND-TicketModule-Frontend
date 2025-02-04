@@ -57,7 +57,7 @@ const LoginForm = ({ onClose }: any) => {
                         alt="logo"
                     />
                 </div>
-                <p className="text-3xl font-semibold text-center py-10">
+                <p className="text-3xl font-semibold text-center py-10 text-black">
                     Ticket Dashboard
                 </p>
                 <div>
@@ -68,7 +68,7 @@ const LoginForm = ({ onClose }: any) => {
                             </label>
                             <input
                                 type="text"
-                                className="w-full p-2 border rounded mt-1 focus:ring focus:border-blue-500 bg-gray-50"
+                                className="w-full p-2 border rounded mt-1 focus:ring focus:border-blue-500 bg-gray-50 text-black"
                                 value={userName}
                                 onChange={(e) => setUserName(e.target.value)}
                                 required
@@ -80,7 +80,7 @@ const LoginForm = ({ onClose }: any) => {
                             </label>
                             <input
                                 type="password"
-                                className="w-full p-2 border rounded mt-1 focus:ring focus:border-blue-500 bg-gray-50"
+                                className="w-full p-2 border rounded mt-1 focus:ring focus:border-blue-500 bg-gray-50 text-black"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required

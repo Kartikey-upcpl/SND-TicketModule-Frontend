@@ -21,6 +21,8 @@ interface assigneesType {
 }
 const TicketModal = ({ isOpen, onClose, onCreate }: Props) => {
     const { user } = useUser();
+    const [ticketId, setTicketId] = useState<string | null>(null);
+    console.log("ticket", ticketId)
     const [formData, setFormData] = useState<TicketFormData>({
         orderId: "",
         customer: '',
@@ -34,31 +36,41 @@ const TicketModal = ({ isOpen, onClose, onCreate }: Props) => {
         imageProofLink: [],
         assignTo: '',
         priority: '',
+        marketplace: '', // New field for marketplace
+        replacementReason: "", // New field for replacement reason
         createdby: user?.username || "", // Set initial value based on user context
     });
+
     const priorities = ['Low', 'Medium', 'High'];
+    const marketplaces = ['Amazon', 'Flipkart', 'Website'];
+    const replacementReasons = ['Wrong Product', 'Damaged Product'];
     const issues = ['Replacement Pickup', 'Missing', 'Part Replacement', "Compensation"];
-    const [assignees, setAssignees] = useState<assigneesType>();
-    const [products, setProducts] = useState<string[]>([]); // List of product names
-    const [selectedProducts, setSelectedProducts] = useState<string[]>([]); // Selected products
+
+    const [assignees, setAssignees] = useState<assigneesType | null>(null);
+    const [products, setProducts] = useState<string[]>([]);
+    const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+    const [manualProduct, setManualProduct] = useState<string>("");
     const [uploadedMediaUrls, setUploadedMediaUrls] = useState<string[]>([]);
-    const ticketId = `SND-${Math.floor(100000 + Math.random() * 900000)}`; // Generate ticketId
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Generate ticketId when modal opens
+    useEffect(() => {
+        if (isOpen) {
+            const generatedTicketId = `SND-${Math.floor(100000 + Math.random() * 900000)}`;
+            setTicketId(generatedTicketId);
+        }
+    }, [isOpen]);
 
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setFormData({ ...formData, [name]: value });
+        setFormData((prev) => ({ ...prev, [name]: value }));
     };
-
     const handleUploadMedia = (urls: string[]) => {
         setUploadedMediaUrls(urls);
-        setFormData((prev) => ({
-            ...prev,
-            imageProofLink: urls
-        }));
+        setFormData((prev) => ({ ...prev, imageProofLink: urls }));
     };
 
-    // Dynamically update `createdby` when `user` changes
     useEffect(() => {
         setFormData((prev) => ({
             ...prev,
@@ -67,60 +79,183 @@ const TicketModal = ({ isOpen, onClose, onCreate }: Props) => {
     }, [user]);
 
     useEffect(() => {
-        const fetchAllUser = async () => {
+        const fetchAllUsers = async () => {
             try {
-                const UserData = await fetchUserAction()
-                setAssignees(UserData)
+                const userData = await fetchUserAction();
+                setAssignees(userData);
             } catch (error: any) {
-                console.log(error.message)
+                console.error("Error fetching users:", error.message);
             }
-        }
-        fetchAllUser()
+        };
+        fetchAllUsers();
     }, []);
 
     const handleSubmit = async () => {
         try {
-            setFormData((prev: any) => ({
-                ...prev,
-                productName: selectedProducts, // Save selected products as an array
-            }));
-            const createdTicket = await createTicketAction({
-                ...formData,
-                ticketId,
-                productName: selectedProducts, // Ensure the API payload uses the array
-            }); // Call API
+            toast.dismiss();
+            // Validation: Check for required fields
+            if (!formData.orderId.trim()) {
+                toast.error("Order ID is required.");
+                return;
+            }
 
-            toast.success('Ticket created successfully!'); // Show success notification
-            onCreate(createdTicket); // Pass created ticket back to parent
-            onClose(); // Close modal
+            if (!formData.customer.trim()) {
+                toast.error("Customer name is required.");
+                return;
+            }
+
+            if (!formData.mobileNo.trim()) {
+                toast.error("Mobile number is required.");
+                return;
+            }
+
+            if (!formData.email.trim()) {
+                toast.error("Email is required.");
+                return;
+            }
+
+            if (!manualProduct.trim() && selectedProducts.length === 0) {
+                toast.error("Please enter a product name or select at least one product.");
+                return;
+            }
+
+
+            if (!formData.orderDate.trim()) {
+                toast.error("Order date is required.");
+                return;
+            }
+
+            if (!formData.issue.trim()) {
+                toast.error("Please select an issue.");
+                return;
+            }
+
+            if (!formData.description.trim()) {
+                toast.error("Description is required.");
+                return;
+            }
+
+            if (!formData.assignTo.trim()) {
+                toast.error("Please assign the ticket to a user.");
+                return;
+            }
+
+            if (!formData.priority.trim()) {
+                toast.error("Please select a priority level.");
+                return;
+            }
+
+            if (!formData.marketplace.trim()) {
+                toast.error("Please select a marketplace.");
+                return;
+            }
+
+            if (formData.issue === "Replacement Pickup") {
+                if (!formData.replacementReason.trim()) {
+                    toast.error("Please select a replacement reason.");
+                    return;
+                }
+
+                if (!formData.reversePickupAWB.trim()) {
+                    toast.error("Please provide the Reverse Pickup AWB.");
+                    return;
+                }
+            }
+
+            const allProducts = manualProduct ? [...selectedProducts, manualProduct] : [...selectedProducts];
+
+            if (allProducts.length === 0) {
+                toast.error("Please enter or select at least one product.");
+                return;
+            }
+
+            console.log("🛠 Sending FormData:", { ...formData, ticketId, productName: allProducts });
+
+            const response = await createTicketAction({
+                ...formData,
+                ticketId: ticketId || "",
+                productName: allProducts,
+            });
+            console.log("response", response)
+            if (response.status === "success") {
+                toast.success("Ticket created successfully!", {
+                    autoClose: 4000,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    hideProgressBar: false,
+                    theme: "light",
+                });
+                onCreate(response.data);
+
+                setFormData({
+                    orderId: "",
+                    customer: "",
+                    mobileNo: "",
+                    email: "",
+                    productName: [],
+                    orderDate: "",
+                    issue: "",
+                    reversePickupAWB: "",
+                    description: "",
+                    imageProofLink: [],
+                    assignTo: "",
+                    priority: "",
+                    marketplace: "",
+                    replacementReason: "",
+                    createdby: user?.username || "",
+                });
+
+                setProducts([]);
+                setManualProduct("");
+                onClose();
+            } else if (response.status === "error") {
+                console.error("🚨 API Error:", response.message);
+                toast.error(response.message);
+            }
         } catch (error: any) {
-            toast.error(`Failed to create ticket: ${error.message}`); // Show error notification
+            console.error("❌ Unexpected Error:", error);
+            toast.error(`Unexpected error: ${error.message}`);
         }
     };
 
+
     const getOrderDetails = async () => {
+        if (!formData.orderId) return;
+        setIsLoading(true);
+
+        // Debugging: Check if environment variables are set correctly
+        // console.log("🔍 API URL:", process.env.NEXT_PUBLIC_SND_ORDER_API);
+        // console.log("🔑 Consumer Key:", process.env.NEXT_PUBLIC_CONSUMER_KEY);
+        // console.log("🔑 Consumer Secret:", process.env.NEXT_PUBLIC_CONSUMER_SECRET);
         const consumer_key = process.env.NEXT_PUBLIC_CONSUMER_KEY;
         const consumer_secret = process.env.NEXT_PUBLIC_CONSUMER_SECRET;
         const api_initial = process.env.NEXT_PUBLIC_SND_ORDER_API;
         try {
-            const response = await axios.get(
-                `${api_initial}${formData.orderId}?consumer_key=${consumer_key}&consumer_secret=${consumer_secret}`
+
+            const response = await axios.get(`
+                ${api_initial}${formData.orderId}?consumer_key=${consumer_key}&consumer_secret=${consumer_secret}`
             );
+
             const data = response?.data;
             const productNames = data.line_items?.map((item: any) => item.name) || [];
+
             setProducts(productNames);
             setFormData((prev) => ({
                 ...prev,
-                customer: data.billing?.first_name || '',
-                mobileNo: data.billing?.phone || '',
-                email: data.billing?.email || '',
-                orderDate: data.date_created?.slice(0, 10) || '',
+                customer: data.billing?.first_name || "",
+                mobileNo: data.billing?.phone || "",
+                email: data.billing?.email || "",
+                orderDate: data.date_created?.slice(0, 10) || "",
             }));
         } catch (error: any) {
-            console.error('Failed to fetch order details:', error.message);
-            toast.error('Failed to fetch order details');
+            console.error("Failed to fetch order details:", error.message);
+            // toast.error("Failed to fetch order details");
+        } finally {
+            setIsLoading(false);
         }
-    }
+    };
+
 
     const handleProductSelection = (product: string, isChecked: boolean) => {
         setSelectedProducts((prev) =>
@@ -150,13 +285,23 @@ const TicketModal = ({ isOpen, onClose, onCreate }: Props) => {
                     </div>
 
                     <div>
-                        <button className='text-sm p-2 rounded bg-slate-300 text-black border' onClick={getOrderDetails}>
-                            Get Order Data
+                        <button
+                            className={`text-sm p-2 rounded bg-slate-300 text-black border ${!formData.orderId || isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+                            onClick={getOrderDetails}
+                            disabled={!formData.orderId || isLoading}
+                        >
+                            {isLoading ? "Fetching..." : "Get Order Data"}
                         </button>
                     </div>
                 </div>
 
                 <div className="space-y-4">
+                    <select name="marketplace" value={formData.marketplace} onChange={handleChange} className="w-full p-2 border rounded">
+                        <option value="">Select Marketplace</option>
+                        {marketplaces.map((marketplace) => (
+                            <option key={marketplace} value={marketplace}>{marketplace}</option>
+                        ))}
+                    </select>
                     <input
                         type="text"
                         name="customer"
@@ -181,6 +326,12 @@ const TicketModal = ({ isOpen, onClose, onCreate }: Props) => {
                         onChange={handleChange}
                         className="w-full p-2 border rounded"
                     />
+                    {products.length === 0 && (
+                        <div className="mb-4">
+                            <h3 className="text-lg font-semibold">Product Name</h3>
+                            <input type="text" placeholder="Enter product name" value={manualProduct} onChange={(e) => setManualProduct(e.target.value)} className="w-full p-2 border rounded" />
+                        </div>
+                    )}
                     {products.length > 0 && (
                         <div className="mb-4">
                             <h3 className="text-lg font-semibold">Products</h3>
@@ -227,13 +378,23 @@ const TicketModal = ({ isOpen, onClose, onCreate }: Props) => {
                         ))}
                     </select>
                     {formData.issue === "Replacement Pickup" &&
-                        <textarea
-                            name="reversePickupAWB"
-                            placeholder="Reverse Pickup AWB"
-                            value={formData.reversePickupAWB}
-                            onChange={handleChange}
-                            className="w-full p-2 border rounded"
-                        />
+                        (
+                            <>
+                                <select name="replacementReason" value={formData.replacementReason} onChange={handleChange} className="w-full p-2 border rounded">
+                                    <option value="">Select Replacement Reason</option>
+                                    {replacementReasons.map((reason) => (
+                                        <option key={reason} value={reason}>{reason}</option>
+                                    ))}
+                                </select>
+                                < textarea
+                                    name="reversePickupAWB"
+                                    placeholder="Reverse Pickup AWB"
+                                    value={formData.reversePickupAWB}
+                                    onChange={handleChange}
+                                    className="w-full p-2 border rounded"
+                                />
+                            </>
+                        )
                     }
                     <textarea
                         name="description"
@@ -242,7 +403,7 @@ const TicketModal = ({ isOpen, onClose, onCreate }: Props) => {
                         onChange={handleChange}
                         className="w-full p-2 border rounded"
                     />
-                    <UploadMedia ticketId={ticketId} onUpload={handleUploadMedia} />
+                    <UploadMedia ticketId={ticketId || ""} onUpload={handleUploadMedia} />
 
                     <select
                         name="priority"
@@ -282,7 +443,7 @@ const TicketModal = ({ isOpen, onClose, onCreate }: Props) => {
                     </button>
                 </div>
             </div>
-            <ToastContainer position="top-right" autoClose={3000} hideProgressBar />
+            <ToastContainer position="bottom-left" autoClose={3000} hideProgressBar />
         </div>
     );
 };

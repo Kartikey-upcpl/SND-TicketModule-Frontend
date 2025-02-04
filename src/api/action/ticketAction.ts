@@ -10,15 +10,25 @@ export async function createTicketAction(ticketData: TicketFormData) {
     try {
         const res = await httpClient({
             endpoint: "tickets",
-            method: 'POST',
+            method: "POST",
             body: ticketData,
         });
 
-        return await res.json(); // Parse and return JSON response
+        // Check for success status codes (e.g., 200, 201)
+        if (res.ok) {
+            // Parse and return JSON response for successful requests
+            return { status: "success", data: await res.json() };
+        }
+
+        // For non-2xx responses, throw an error with the returned message
+        const errorData = await res.json();
+        throw new Error(errorData.message || "Failed to create ticket.");
     } catch (error: any) {
-        return { status: 'error', message: error.message };
+        // Catch network or parsing errors
+        return { status: "error", message: error.message || "An unexpected error occurred." };
     }
 }
+
 /**
  * Fetch all tickets
  * @returns {Promise<object>} - List of tickets

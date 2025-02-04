@@ -3,7 +3,7 @@ import Link from "next/link";
 export default function NotFound() {
     return (
         <main>
-            <section className="">
+            <section className="text-black p-20">
                 <div className="content container">
                     <h2 className="mb-3">OOPS!</h2>
                     <h3 className="mb-3">Page not found</h3>

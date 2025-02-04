@@ -1,5 +1,5 @@
-// const API_BASE_URL = 'http://localhost:5000'; // Replace with your backend URL
-const API_BASE_URL = 'https://ticket.gosnd.com'; // Replace with your backend URL
+const API_BASE_URL = 'http://localhost:5000'; // Replace with your backend URL
+// const API_BASE_URL = 'https://ticket.gosnd.com'; // Replace with your backend URL
 
 
 
@@ -18,7 +18,7 @@ export async function httpClient({
     headers?: Record<string, string>;
     query?: Record<string, string | number>;
     credentials?: string
-}): Promise<Response> {
+}): Promise<Response> {  // ✅ Return a Response-like object
     try {
         const queryString = new URLSearchParams(
             Object.entries(query).reduce((acc, [key, value]) => {
@@ -40,21 +40,31 @@ export async function httpClient({
 
 
         const response = await fetch(url, options);
-        // console.log('response', response);
+        const contentType = response.headers.get('content-type');
 
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.message || 'API request failed');
-        }
-
-        return response;
-    } catch (error) {
-        if (error instanceof Error) {
-            console.error('HTTP Request Error:', error.message);
+        let responseData;
+        if (contentType && contentType.includes('application/json')) {
+            responseData = await response.json();
         } else {
-            console.error('An unknown error occurred');
+            responseData = await response.text();
         }
-        throw error;
+
+        // console.log('HTTP Response:', responseData);
+
+        // ✅ Simulate a Response-like object so `.json()` still works
+        return new Response(JSON.stringify(responseData), {
+            status: response.status,
+            statusText: response.statusText,
+            headers: { 'Content-Type': 'application/json' }
+        });
+    } catch (error) {
+        // console.error('HTTP Request Error:', error);
+
+        // ✅ Simulate an error Response so `.json()` still works
+        return new Response(JSON.stringify({ error: error instanceof Error ? error.message : 'An unknown error occurred' }), {
+            status: 500,
+            statusText: 'Internal Server Error',
+            headers: { 'Content-Type': 'application/json' }
+        });
     }
 }

@@ -8,6 +8,7 @@ import { handleImageUploadForTicket } from "@/api/action/mediaAction";
 import { commentsByTicketId, resolveTicketAction, submitComment, ticketById, updateForwardPickup, updateReversePickup, updateTicketAction } from "@/api/action/ticketAction";
 import { useUser } from "@/context/UserContext";
 import Image from "next/image";
+import Link from "next/link";
 
 const TicketPage: React.FC = () => {
     const { ticketId } = useParams<{ ticketId: string }>(); // Get ticketId directly from useParams
@@ -242,7 +243,7 @@ const TicketPage: React.FC = () => {
 
                 {/* Ticket Details */}
                 <div className="space-y-6 mb-8">
-                    <div>
+                    <div className="text-gray-700">
                         <strong className="text-gray-700">Customer:</strong> {ticket.customer}
                     </div>
                     <div>
@@ -252,7 +253,7 @@ const TicketPage: React.FC = () => {
                         </span>
                     </div>
                     <div>
-                        <strong className="text-gray-700">Issue:</strong>
+                        <strong className="text-gray-700">Issue:</strong>{" "}
                         <span className={`p-2 text-sm font-medium rounded ${getIssueColor(ticket?.issue)}`}>
                             {ticket.issue}
                         </span>
@@ -263,7 +264,7 @@ const TicketPage: React.FC = () => {
                             <div className="flex items-center space-x-4 mt-3">
                                 <textarea
                                     rows={3}
-                                    className="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0CAF60]"
+                                    className="border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#0CAF60] text-black"
                                     value={updatedDescription}
                                     onChange={(e) => setUpdatedDescription(e.target.value)}
                                 />
@@ -292,57 +293,54 @@ const TicketPage: React.FC = () => {
                 {/* Uploaded Media */}
                 <div className="mb-6">
                     <strong className="text-gray-700">Uploaded Media:</strong>
-                    {ticket.imageProofLink && ticket.imageProofLink.length > 0 ? (
-                        <div className="flex flex-wrap gap-4 mt-3">
-                            {ticket.imageProofLink.map((link: string, index: number) => {
-                                const mimeType = getMimeType(link.trim());
-                                const isImage = ["image/jpeg", "image/png", "image/gif"].includes(mimeType || "");
-                                const isVideo = ["video/mp4", "video/mpeg", "video/avi"].includes(mimeType || "");
+                    <div className="flex flex-wrap gap-4 mt-3">
+                        {ticket.imageProofLink.map((link: string, index: number) => {
+                            const mimeType = getMimeType(link.trim());
+                            const isImage = ["image/jpeg", "image/png", "image/gif"].includes(mimeType || "");
+                            const isVideo = ["video/mp4", "video/mpeg", "video/avi"].includes(mimeType || "");
 
-                                return isImage ? (
-                                    <a
-                                        key={`image-${index}`}
-                                        href={link.trim()}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="block w-32 h-32 rounded-lg shadow-md overflow-hidden border"
+                            return isImage ? (
+                                <Link
+                                    key={`image-${index}`}
+                                    href={link.trim()}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="rounded-lg shadow-md border"
+                                >
+                                    <Image
+                                        src={link.trim()}
+                                        alt={`Uploaded image ${index + 1}`}
+                                        width={500}
+                                        height={500}
+                                        className="w-32 h-32 object-fill"
+                                    />
+                                </Link>
+                            ) : isVideo ? (
+                                <a
+                                    key={`video-${index}`}
+                                    href={link.trim()}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="block w-32 h-32 rounded-lg shadow-md overflow-hidden border"
+                                >
+                                    <video
+                                        src={link.trim()}
+                                        className="w-full h-full"
+                                        controls
                                     >
-                                        <Image
-                                            src={link.trim()}
-                                            alt={`Uploaded image ${index + 1}`}
-                                            width={500}
-                                            height={500}
-                                        />
-                                    </a>
-                                ) : isVideo ? (
-                                    <a
-                                        key={`video-${index}`}
-                                        href={link.trim()}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
-                                        className="block w-32 h-32 rounded-lg shadow-md overflow-hidden border"
-                                    >
-                                        <video
-                                            src={link.trim()}
-                                            className="w-full h-full"
-                                            controls
-                                        >
-                                            Your browser does not support the video tag.
-                                        </video>
-                                    </a>
-                                ) : (
-                                    <p key={`unsupported-${index}`} className="text-red-500">
-                                        Unsupported media type.
-                                    </p>
-                                );
-                            })}
-                        </div>
-                    ) : (
-                        <div className="mt-3">
-                            <p className="text-gray-600">No media found. Please upload images or videos:</p>
-                            <UploadMedia ticketId={ticket.ticketId} onUpload={uploadImages} />
-                        </div>
-                    )}
+                                        Your browser does not support the video tag.
+                                    </video>
+                                </a>
+                            ) : (
+                                <p key={`unsupported-${index}`} className="text-red-500">
+                                    Unsupported media type.
+                                </p>
+                            );
+                        })}
+                    </div>
+                    <div className="mt-3">
+                        <UploadMedia ticketId={ticket.ticketId} onUpload={uploadImages} />
+                    </div>
                 </div>
 
                 {/* Priority */}
@@ -361,7 +359,7 @@ const TicketPage: React.FC = () => {
                                 <div className="flex items-center space-x-4 mt-3">
                                     <textarea
                                         rows={3}
-                                        className="border w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        className="border w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black"
                                         value={reverseAwbValue}
                                         onChange={(e) => setReverseAwbValue(e.target.value)}
                                     />
@@ -394,7 +392,7 @@ const TicketPage: React.FC = () => {
                                 <div className="flex items-center space-x-4 mt-3">
                                     <textarea
                                         rows={3}
-                                        className="border w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                        className="border w-full p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black"
                                         value={forwardAwbValue}
                                         onChange={(e) => setForwardAwbValue(e.target.value)}
                                     />
@@ -428,7 +426,7 @@ const TicketPage: React.FC = () => {
                     {isResolving ? (
                         <div className="space-y-4 w-full">
                             <textarea
-                                className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                className="w-full border p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 text-black"
                                 rows={4}
                                 placeholder="Enter your resolution comment here"
                                 value={resolveComment}
@@ -453,7 +451,7 @@ const TicketPage: React.FC = () => {
             </div>
 
             <div className="sm:w-1/4 md:w-3/10 p-4 border-2 border-gray-300 max-h-[650px] overflow-y-scroll">
-                <h2 className="text-xl font-bold mb-4">Comments</h2>
+                <h2 className="text-xl font-bold mb-4 text-gray-700">Comments</h2>
                 <div className="space-y-4">
                     {comments.map((comment, index) => (
                         <div
@@ -461,12 +459,12 @@ const TicketPage: React.FC = () => {
                             className="p-4 bg-gray-100 rounded-md shadow-sm flex flex-col relative z-0"
                             style={{ overflow: "hidden" }}
                         >
-                            <div className="text-sm text-gray-600">
-                                <strong>{comment.commentedBy}</strong> at{" "}
-                                {new Date(comment.commentedAt).toLocaleString()}
-                            </div>
                             <div className="text-gray-800 break-words overflow-wrap max-w-96">
                                 {comment.comment}
+                            </div>
+                            <div className="text-xs bg-[#e1e1e1] rounded-sm text-center text-[#0caf60] mt-3 italic w-fit p-1">
+                                <strong>{comment.commentedBy.toUpperCase()}</strong> at{" "}
+                                {new Date(comment.commentedAt).toLocaleString()}
                             </div>
                         </div>
                     ))}
@@ -477,7 +475,7 @@ const TicketPage: React.FC = () => {
                         value={newComment}
                         onChange={(e) => setNewComment(e.target.value)}
                         rows={4}
-                        className="w-full p-2 border rounded-md"
+                        className="w-full p-2 border rounded-md text-black"
                         placeholder="Add a new comment..."
                     ></textarea>
                     <button

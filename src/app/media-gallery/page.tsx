@@ -41,7 +41,7 @@ const ImageGallery: React.FC = () => {
     }
     return (
         <div className="p-4">
-            <h1 className="text-2xl font-bold mb-4">Image Gallery</h1>
+            <h1 className="text-2xl font-bold mb-4 text-black">Image Gallery</h1>
 
             {loading && <p className="text-gray-500">Loading images...</p>}
 

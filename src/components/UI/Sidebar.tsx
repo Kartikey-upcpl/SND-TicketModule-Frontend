@@ -28,23 +28,6 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     const [ticketCounts, setTicketCounts] = useState<Record<string, number> | null>(null);
     const pathname = usePathname(); // Use usePathname to get the current route
 
-
-
-    // useEffect(() => {
-    //     const fetchTicketCounts = async () => {
-    //         try {
-    //             const response = await ticketSummaryAction(); // Call the API action
-    //             console.log("res", response)
-    //             setTicketCounts(response); // Store the response in state
-    //         } catch (err: any) {
-    //             console.error("Error fetching ticket summary:", err.message);
-    //             setError(err.message); // Handle errors
-    //         }
-    //     };
-    //     fetchTicketCounts(); // Invoke the async function
-    // }, []); // Empty dependency array to run this effect only once
-
-
     useEffect(() => {
         // When `users` is available, update `assignees`
         if (TicketSummary) {
@@ -62,10 +45,10 @@ const Sidebar: React.FC<SidebarProps> = ({ onClose }) => {
     if (isLoading) return <div>Loading...</div>;
     if (isError) return <div>Error fetching ticket summary.</div>;
     return (
-        <div className="flex h-screen fixed">
+        <div className="flex h-screen fixed overflow-y-scroll 2xl:overflow-y-hidden">
             {/* Sidebar */}
-            <div className="w-full border-r border-gray-300 p-4 bg-[#fdfefd] py-20">
-                <h2 className="text-lg font-semibold mb-4">Tickets</h2>
+            <div className="border-r-2 border-gray-300 p-4 bg-[#fdfefd] sm:py-20">
+                <h2 className="text-lg font-semibold mb-4 text-black text-center">Tickets</h2>
                 <ul className="space-y-2">
                     {tabs
                         .filter(tab => tab.roles.includes(userRole))

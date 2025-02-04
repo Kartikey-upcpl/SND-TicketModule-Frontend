@@ -34,15 +34,13 @@ const PriorityTickets = () => {
     }, []);
 
     return (
-        <div>
-            <div className="mt-4">
-                {error && <p className="text-red-500">Error: {error}</p>}
-                {!error && tickets.length > 0 ? (
-                    <Table columns={columns} data={tickets} />
-                ) : (
-                    <p className="text-gray-600">No tickets available.</p>
-                )}
-            </div>
+        <div className="mt-4 xl:px-10 lg:px-20 px-6">
+            {error && <p className="text-red-500">Error: {error}</p>}
+            {!error && tickets.length > 0 ? (
+                <Table columns={columns} data={tickets} />
+            ) : (
+                <p className="text-gray-600">No tickets available.</p>
+            )}
         </div>
     )
 }

@@ -13,45 +13,6 @@ const Dashboard = () => {
     const { users } = useUsers();
     const { TicketSummary } = useTicketSummary();
 
-
-    // useEffect(() => {
-    //     axios
-    //         .get(`${process.env.NEXT_PUBLIC_API_URL}/api/refund-stats`)
-    //         .then((response) => {
-    //             const data = response?.data;
-    //             // console.log("data", data);
-    //             setTotalRefundedAmount(data.totalRefundedAmount);
-    //             setTotalReturnedProducts(data.totalReturnedProducts);
-    //             setTotalUser(data.totalUsers);
-    //         })
-    //         .catch((error) => console.error("Error fetching Refund Stats"));
-    // }, []);
-
-    // useEffect(() => {
-    //     axios
-    //         .get(`${process.env.NEXT_PUBLIC_API_URL}/api/total-valuation-refundAmount`)
-    //         .then((response) => {
-    //             const data = response?.data;
-    //             // console.log("data", data);
-    //             setValuationTotalRefundedAmount(data.totalValuationRefundAmount);
-    //         })
-    //         .catch((error) => console.error("Error fetching Refund Stats"));
-    // }, []);
-
-    // useEffect(() => {
-    //     axios
-    //         .get(`${process.env.NEXT_PUBLIC_API_URL}/api/most-active-submitter`)
-    //         .then((response) => {
-    //             const data = response?.data;
-    //             // console.log("data", data);
-    //             setMaximumFormSubmission({
-    //                 submitterName: data?._id,
-    //                 submissionCount: data?.count,
-    //             });
-    //         })
-    //         .catch((error) => console.error("Error fetching Refund Stats"));
-    // }, []);
-
     return (
         <div className=" overflow-hidden py-10 px-6">
             <h1 className="text-center text-4xl font-bold text-indigo-600 mb-8 ">

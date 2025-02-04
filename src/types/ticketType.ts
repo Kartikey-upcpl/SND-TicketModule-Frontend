@@ -12,6 +12,8 @@ export interface TicketFormData {
     priority: string;
     assignTo: string;
     createdby: string;
+    marketplace: string
+    replacementReason: string;
     imageProofLink: string[];
 }
 

@@ -96,83 +96,79 @@ const AllTickets = () => {
     if (isError) return <div>Error fetching users.</div>;
 
     return (
-        <div className='py-2'>
-            <div className="bg-white py-4 px-6 sm:flex sm:flex-wrap items-center ">
-                {/* Filters Section */}
-                <div className="space-y-3 sm:space-y-0 sm:space-x-4 sm:flex sm:flex-wrap items-center text-[#293240]">
-                    <select
-                        name="assignTo"
-                        value={filters.assignTo}
-                        onChange={(e) => setFilters({ ...filters, assignTo: e.target.value })}
-                        className="sm:w-40 w-full h-10 px-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0caf60] text-[#293240]"
-                    >
-                        <option value="">Select Assigned User</option>
-                        {assignees?.users?.map((user: UserType) => (
-                            <option key={user._id} value={user.username}>
-                                {user.username}
-                            </option>
-                        ))}
-                    </select>
-                    <input
-                        type="text"
-                        placeholder="Email"
-                        value={filters.email}
-                        onChange={(e) => setFilters({ ...filters, email: e.target.value })}
-                        className="sm:w-40 w-full h-10 px-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0caf60] text-[#293240]"
+        <div className='py-2 xl:px-10 lg:px-20 px-6'>
+            {/* Filters Section */}
+            <div className=" py-4 text-[#293240] flex flex-wrap gap-4">
+                <select
+                    name="assignTo"
+                    value={filters.assignTo}
+                    onChange={(e) => setFilters({ ...filters, assignTo: e.target.value })}
+                    className="sm:w-40 w-full h-10 px-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0caf60] text-[#293240]"
+                >
+                    <option value="">Select Assigned User</option>
+                    {assignees?.users?.map((user: UserType) => (
+                        <option key={user._id} value={user.username}>
+                            {user.username}
+                        </option>
+                    ))}
+                </select>
+                <input
+                    type="text"
+                    placeholder="Email"
+                    value={filters.email}
+                    onChange={(e) => setFilters({ ...filters, email: e.target.value })}
+                    className="sm:w-40 w-full h-10 px-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0caf60] text-[#293240]"
+                />
+                <input
+                    type="text"
+                    placeholder="Mobile No"
+                    value={filters.mobileNo}
+                    onChange={(e) => setFilters({ ...filters, mobileNo: e.target.value })}
+                    className="sm:w-40 w-full h-10 px-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0caf60] text-[#293240]"
+                />
+                <input
+                    type="text"
+                    placeholder="Order ID"
+                    value={filters.orderId}
+                    onChange={(e) => setFilters({ ...filters, orderId: e.target.value })}
+                    className="sm:w-40 w-full h-10 px-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0caf60] text-[#293240]"
+                />
+                <DateRangeFilter
+                    startDate={startDate}
+                    endDate={endDate}
+                    onStartDateChange={(date) => {
+                        setStartDate(date);
+                        setFilters((prev) => ({ ...prev, startDate: formatDate(date) }));
+                    }}
+                    onEndDateChange={(date) => {
+                        setEndDate(date);
+                        setFilters((prev) => ({ ...prev, endDate: formatDate(date) }));
+                    }}
+                />
+                <div className="w-full sm:w-auto ">
+                    <Tooltip title="Create Ticket" arrow>
+                        <button
+                            onClick={() => setIsModalOpen(true)}
+                            className="bg-[#0caF60] hover:bg-[#258758] p-2 text-white  rounded  font-medium transition duration-200 w-full relative"
+                        >
+                            Create Ticket +
+                        </button>
+                    </Tooltip>
+                    <TicketModal
+                        isOpen={isModalOpen}
+                        onClose={() => setIsModalOpen(false)}
+                        onCreate={handleCreate}
                     />
-                    <input
-                        type="text"
-                        placeholder="Mobile No"
-                        value={filters.mobileNo}
-                        onChange={(e) => setFilters({ ...filters, mobileNo: e.target.value })}
-                        className="sm:w-40 w-full h-10 px-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0caf60] text-[#293240]"
-                    />
-                    <input
-                        type="text"
-                        placeholder="Order ID"
-                        value={filters.orderId}
-                        onChange={(e) => setFilters({ ...filters, orderId: e.target.value })}
-                        className="sm:w-40 w-full h-10 px-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0caf60] text-[#293240]"
-                    />
-                    <DateRangeFilter
-                        startDate={startDate}
-                        endDate={endDate}
-                        onStartDateChange={(date) => {
-                            setStartDate(date);
-                            setFilters((prev) => ({ ...prev, startDate: formatDate(date) }));
-                        }}
-                        onEndDateChange={(date) => {
-                            setEndDate(date);
-                            setFilters((prev) => ({ ...prev, endDate: formatDate(date) }));
-                        }}
-                    />
-                    <div className="relative sm:left-36">
-                        <Tooltip title="Create Ticket" arrow>
-                            <button
-                                onClick={() => setIsModalOpen(true)}
-                                className="bg-[#0caF60] hover:bg-[#258758] text-white px-2 py-1 rounded  font-medium transition duration-200"
-                            >
-                                +
-                            </button>
-                        </Tooltip>
-                        <TicketModal
-                            isOpen={isModalOpen}
-                            onClose={() => setIsModalOpen(false)}
-                            onCreate={handleCreate}
-                        />
-                    </div>
                 </div>
             </div>
 
-            <div>
-                <div className="mt-4">
-                    {error && <p className="text-red-500">Error: {error}</p>}
-                    {!error && tickets.length > 0 ? (
-                        <Table columns={columns} data={tickets} />
-                    ) : (
-                        <p className="text-gray-600">No tickets available.</p>
-                    )}
-                </div>
+            <div className="mt-4">
+                {error && <p className="text-red-500">Error: {error}</p>}
+                {!error && tickets.length > 0 ? (
+                    <Table columns={columns} data={tickets} />
+                ) : (
+                    <p className="text-gray-600">No tickets available.</p>
+                )}
             </div>
         </div>
     )

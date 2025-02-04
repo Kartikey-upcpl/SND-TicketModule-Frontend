@@ -46,14 +46,14 @@ const UpdateTicketStatus = ({ isOpen, onClose, ticketId, username }: Props) => {
     return (
         <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex justify-center items-center">
             <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                <h2 className="text-xl font-semibold mb-4">Update Ticket Status</h2>
+                <h2 className="text-xl font-semibold mb-4 text-black ">Update Ticket Status</h2>
 
                 <div className="space-y-4">
                     <select
                         name="priority"
                         value={formData.priority}
                         onChange={handleChange}
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border rounded text-black"
                     >
                         <option value="">Update Priority</option>
                         {priorities.map((priority) => (
@@ -66,7 +66,7 @@ const UpdateTicketStatus = ({ isOpen, onClose, ticketId, username }: Props) => {
                         name="status"
                         value={formData.status}
                         onChange={handleChange}
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border rounded text-black"
                     >
                         <option value="">Update Status</option>
                         {statuses.map((status) => (

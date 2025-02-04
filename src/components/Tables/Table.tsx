@@ -52,7 +52,7 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 const MuiTable: React.FC<TableProps> = ({ columns, data }) => {
     return (
-        <TableContainer style={{ overflowX: "auto", }} component={Paper}>
+        <TableContainer style={{ overflowX: "auto" }} component={Paper}>
             <Table>
                 <TableHead>
                     <TableRow>

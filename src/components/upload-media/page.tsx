@@ -15,9 +15,20 @@ const UploadMedia: React.FC<UploadMediaProps> = ({ onUpload, ticketId }) => {
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (event.target.files) {
-            setFiles(Array.from(event.target.files));
+            const selectedFiles = Array.from(event.target.files);
+            const maxSize = 50 * 1024 * 1024; // 50MB
+
+            for (let file of selectedFiles) {
+                if (file.size > maxSize) {
+                    setUploadStatus(`Error: ${file.name} exceeds 50MB. Please choose a smaller file.`);
+                    return; // Stop execution
+                }
+            }
+
+            setFiles(selectedFiles);
         }
     };
+
 
     const handleUpload = async () => {
         if (files.length === 0) {
@@ -31,13 +42,22 @@ const UploadMedia: React.FC<UploadMediaProps> = ({ onUpload, ticketId }) => {
         });
 
         try {
-            const response = await fetch("https://ticket.gosnd.com/api/media/upload", {
+            // const response = await fetch("https://ticket.gosnd.com/api/media/upload", {
+            const response = await fetch("http://localhost:5000/api/media/upload", {
                 method: "POST",
                 body: formData,
             });
             if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Failed to upload media");
+                if (response.status === 413) {
+                    throw new Error("File size exceeds the 50MB limit. Please upload a smaller file.");
+                } let errorData;
+                try {
+                    errorData = await response.json();
+                } catch (e) {
+                    throw new Error("Unexpected server error. Please try again later.");
+                }
+
+                throw new Error(errorData.message || "Failed to upload media.");
             }
 
             const data = await response.json();
@@ -46,7 +66,8 @@ const UploadMedia: React.FC<UploadMediaProps> = ({ onUpload, ticketId }) => {
             setUploadStatus("Media uploaded successfully!");
             onUpload(urls); // Pass the uploaded URLs to the parent component
         } catch (error: any) {
-            setUploadStatus(`Upload failed: ${error.message}`);
+            console.log("erorr", error)
+            setUploadStatus(error.message);
         }
     };
 
@@ -63,7 +84,7 @@ const UploadMedia: React.FC<UploadMediaProps> = ({ onUpload, ticketId }) => {
                 accept="media_type"
                 multiple
                 onChange={handleFileChange}
-                className="mb-4"
+                className="mb-4 text-black"
             />
             <button
                 onClick={handleUpload}
