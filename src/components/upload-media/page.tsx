@@ -42,8 +42,8 @@ const UploadMedia: React.FC<UploadMediaProps> = ({ onUpload, ticketId }) => {
         });
 
         try {
-            // const response = await fetch("https://ticket.gosnd.com/api/media/upload", {
-            const response = await fetch("http://localhost:5000/api/media/upload", {
+            const response = await fetch("https://ticket.gosnd.com/api/media/upload", {
+                // const response = await fetch("http://localhost:5000/api/media/upload", {
                 method: "POST",
                 body: formData,
             });
