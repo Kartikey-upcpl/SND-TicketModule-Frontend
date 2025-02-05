@@ -22,7 +22,7 @@ interface assigneesType {
 const TicketModal = ({ isOpen, onClose, onCreate }: Props) => {
     const { user } = useUser();
     const [ticketId, setTicketId] = useState<string | null>(null);
-    console.log("ticket", ticketId)
+    // console.log("ticket", ticketId)
     const [formData, setFormData] = useState<TicketFormData>({
         orderId: "",
         customer: '',
@@ -42,9 +42,9 @@ const TicketModal = ({ isOpen, onClose, onCreate }: Props) => {
     });
 
     const priorities = ['Low', 'Medium', 'High'];
-    const marketplaces = ['Amazon', 'Flipkart', 'Website'];
+    const marketplaces = ['Amazon', 'Flipkart', 'Website', "FirstCry", "Blinkit", "Meesho", "Other"];
     const replacementReasons = ['Wrong Product', 'Damaged Product'];
-    const issues = ['Replacement Pickup', 'Missing', 'Part Replacement', "Compensation"];
+    const issues = ['Replacement Pickup', 'Missing', 'Part Replacement', "Compensation", "Part Purchase"];
 
     const [assignees, setAssignees] = useState<assigneesType | null>(null);
     const [products, setProducts] = useState<string[]>([]);
@@ -169,14 +169,14 @@ const TicketModal = ({ isOpen, onClose, onCreate }: Props) => {
                 return;
             }
 
-            console.log("🛠 Sending FormData:", { ...formData, ticketId, productName: allProducts });
+            // console.log("🛠 Sending FormData:", { ...formData, ticketId, productName: allProducts });
 
             const response = await createTicketAction({
                 ...formData,
                 ticketId: ticketId || "",
                 productName: allProducts,
             });
-            console.log("response", response)
+            // console.log("response", response)
             if (response.status === "success") {
                 toast.success("Ticket created successfully!", {
                     autoClose: 4000,

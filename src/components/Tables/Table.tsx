@@ -124,7 +124,9 @@ const MuiTable: React.FC<TableProps> = ({ columns, data }) => {
                                                                     ? "#1b19a4"
                                                                     : row[column.accessor] === "Part Replacement"
                                                                         ? "#a8159c"
-                                                                        : "transparent", // Default background if no match
+                                                                        : row[column.accessor] === "Part Purchase"
+                                                                            ? "#e0911a"
+                                                                            : "transparent", // Default background if no match
                                                 }}
                                             >
                                                 {row[column.accessor]}

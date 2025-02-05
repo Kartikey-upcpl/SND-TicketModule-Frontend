@@ -29,6 +29,11 @@ export async function createTicketAction(ticketData: TicketFormData) {
     }
 }
 
+
+
+
+
+
 /**
  * Fetch all tickets
  * @returns {Promise<object>} - List of tickets
@@ -50,6 +55,40 @@ export async function fetchTicketsAction(
         return { status: 'error', message: error.message };
     }
 }
+
+/**
+ * Fetch tickets by status (and optionally by assigned user)
+ * @returns {Promise<object>} - List of tickets by status and/or assigned user
+ */
+export async function fetchTicketsbyStatus(
+    status?: "In-Progress" | "Closed" | "Hold",
+    assignTo?: string, // Added optional assignTo parameter
+    endpoint: string = "tickets"
+) {
+    try {
+        const query: Record<string, string> = {};
+        if (status) query.status = status;
+        if (assignTo) query.assignTo = assignTo; // ✅ Add assignTo filter
+
+        // console.log("Fetching Tickets with Query:", query); // Debugging Log
+
+        const res = await httpClient({
+            endpoint: endpoint,
+            method: "GET",
+            query, // ✅ Send both status and assignTo in the request
+        });
+
+        const data = await res.json();
+
+        // console.log("Fetched Tickets Data:", data); // ✅ Debugging Log
+
+        return data;
+    } catch (error: any) {
+        console.error("Error Fetching Tickets:", error.message);
+        return { status: "error", message: error.message };
+    }
+}
+
 /**
  * Fetch priority tickets
  * @returns {Promise<object>} - List of priority tickets which is open
