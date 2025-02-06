@@ -58,8 +58,8 @@ const TicketPage: React.FC = () => {
     const saveReversePickup = async () => {
         try {
             const response = await updateReversePickup(ticket?._id, reverseAwbValue, user?.fullname || "")
-
-            if (!response.ok) {
+            // console.log("response", response)
+            if (!response.ticket) {
                 throw new Error("Failed to update Reverse Pickup AWB");
             }
 
@@ -79,7 +79,7 @@ const TicketPage: React.FC = () => {
         try {
             const response = await updateForwardPickup(ticket?._id, forwardAwbValue, user?.fullname || "")
 
-            if (!response.ok) {
+            if (!response.ticket) {
                 throw new Error("Failed to update Forward Shipping AWB");
             }
 
@@ -102,12 +102,11 @@ const TicketPage: React.FC = () => {
         }
         try {
             const response = await resolveTicketAction(ticket?._id, resolveComment, user?.fullname || "")
-
-            if (!response.ok) {
+            if (!response?.ticket) {
                 throw new Error("Failed to resolve ticket");
             }
 
-            toast.success("Ticket resolved successfully!");
+            toast.success(response?.message);
             setTicket((prev: any) => ({
                 ...prev,
                 status: "Closed",
@@ -227,6 +226,7 @@ const TicketPage: React.FC = () => {
                         <span className="text-gray-600">Ticket ID:</span>
                         <span className="text-[#0CAF60]">{ticket.ticketId}</span>
                     </p>
+
                     <button
                         onClick={() => setIsModalOpen(true)}
                         className="px-4 py-2 bg-[#0CAF60] text-white font-medium rounded-lg shadow hover:bg-[#258758] transition duration-200"
@@ -243,6 +243,10 @@ const TicketPage: React.FC = () => {
 
                 {/* Ticket Details */}
                 <div className="space-y-6 mb-8">
+                    <p className="sm:text-lg font-semibold">
+                        <span className="text-gray-600">Order ID:</span>
+                        <span className="text-[#bb1467]">{ticket.orderId}</span>
+                    </p>
                     <div className="text-gray-700">
                         <strong className="text-gray-700">Customer:</strong> {ticket.customer}
                     </div>
@@ -364,7 +368,7 @@ const TicketPage: React.FC = () => {
                                         onChange={(e) => setReverseAwbValue(e.target.value)}
                                     />
                                     <button
-                                        className="px-4 py-2 bg-green-500 text-white font-medium rounded-lg shadow hover:bg-green-600 transition duration-200"
+                                        className="p-2 hover:bg-[#0CAF60] hover:text-white bg-transparent text-[#0CAF60] border border-[#0CAF60] font-medium rounded-lg shadow  transition duration-200"
                                         onClick={saveReversePickup}
                                     >
                                         Save
@@ -376,7 +380,7 @@ const TicketPage: React.FC = () => {
                                         {ticket.reversePickupAWB || "N/A"}
                                     </div>
                                     <button
-                                        className="px-4 py-2 bg-indigo-500 text-white font-medium rounded-lg shadow hover:bg-indigo-600 transition duration-200"
+                                        className="p-2 hover:bg-[#0CAF60] hover:text-white bg-transparent text-[#0CAF60] border border-[#0CAF60] font-medium rounded-lg shadow  transition duration-200"
                                         onClick={() => setIsEditingReverseAWB(true)}
                                     >
                                         Edit
@@ -397,7 +401,7 @@ const TicketPage: React.FC = () => {
                                         onChange={(e) => setForwardAwbValue(e.target.value)}
                                     />
                                     <button
-                                        className="px-4 py-2 bg-green-500 text-white font-medium rounded-lg shadow hover:bg-green-600 transition duration-200"
+                                        className="p-2 hover:bg-[#0CAF60] hover:text-white bg-transparent text-[#0CAF60] border border-[#0CAF60] font-medium rounded-lg shadow  transition duration-200"
                                         onClick={saveForwardPickup}
                                     >
                                         Save
@@ -410,7 +414,7 @@ const TicketPage: React.FC = () => {
                                     </div>
 
                                     <button
-                                        className="px-4 py-2 bg-indigo-500 text-white font-medium rounded-lg shadow hover:bg-indigo-600 transition duration-200"
+                                        className="p-2 hover:bg-[#0CAF60] hover:text-white bg-transparent text-[#0CAF60] border border-[#0CAF60] font-medium rounded-lg shadow  transition duration-200"
                                         onClick={() => setIsForwardAWB(true)}
                                     >
                                         Edit
