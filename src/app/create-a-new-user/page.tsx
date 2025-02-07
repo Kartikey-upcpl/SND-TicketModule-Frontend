@@ -48,23 +48,23 @@ const SignupPage = () => {
                         alt="logo"
                     />
                 </div>
-                <form className='w-full mt-2 space-y-2' onSubmit={handleSubmit}>
+                <form className='w-full mt-2 space-y-2 ' onSubmit={handleSubmit}>
                     <input
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border rounded text-black"
                         name="username"
                         placeholder="User Name"
                         value={formData.username}
                         onChange={handleChange}
                     />
                     <input
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border rounded text-black"
                         name="fullname"
                         placeholder="Full Name"
                         value={formData.fullname}
                         onChange={handleChange}
                     />
                     <input
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border rounded text-black"
                         name="email"
                         placeholder="Email"
                         type="email"
@@ -72,7 +72,7 @@ const SignupPage = () => {
                         onChange={handleChange}
                     />
                     <input
-                        className="w-full p-2 border rounded"
+                        className="w-full p-2 border rounded text-black"
                         name="password"
                         placeholder="Password"
                         type="password"
@@ -80,11 +80,11 @@ const SignupPage = () => {
                         onChange={handleChange}
                     />
                     <select
-                        className='w-full p-2 border rounded'
+                        className='w-full p-2 border rounded text-black'
                         name="role"
                         value={formData.role}
                         onChange={handleChange}>
-                        <option value="Agent">Select User Role</option>
+                        <option value="Select User Role">Select User Role</option>
                         <option value="Agent">Agent</option>
                         <option value="Admin">Admin</option>
                     </select>

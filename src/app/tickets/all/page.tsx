@@ -24,6 +24,9 @@ const AllTickets = () => {
     const [assignees, setAssignees] = useState<assigneesType>();
     const [startDate, setStartDate] = useState<Date | null>(null);
     const [endDate, setEndDate] = useState<Date | null>(null);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
     const [filters, setFilters] = useState({
         assignTo: "",
         email: "",
@@ -40,7 +43,7 @@ const AllTickets = () => {
         { header: 'Assigned To', accessor: 'assignTo' },
         { header: 'Status', accessor: 'status' },
         { header: 'Priority', accessor: 'priority' },
-        // { header: 'Description', accessor: 'description' },
+        { header: 'Marketplace', accessor: 'marketplace' },
         { header: 'Mobile No', accessor: 'mobileNo' },
         { header: 'Created By', accessor: 'createdby' },
         { header: 'Created At', accessor: 'createdAt' },
@@ -59,22 +62,27 @@ const AllTickets = () => {
     };
 
     // Fetch Tickets on Component Mount
-    const fetchTickets = async (assignTo?: string) => {
+    const fetchTickets = async (page = 1, limitSize = limit) => {
         try {
             const formattedFilters = {
                 ...filters,
                 startDate: formatDate(startDate),
                 endDate: formatDate(endDate),
+                page,  // Include page number
+                limit: limitSize, // Fetch 10 tickets per request
             };
             // Build the query string dynamically based on filters
             const queryString = new URLSearchParams(
                 Object.entries(formattedFilters).reduce((acc, [key, value]) => {
-                    if (value) acc[key] = value;
+                    if (value !== undefined && value !== null) acc[key] = String(value);
                     return acc;
                 }, {} as Record<string, string>)
             ).toString();
-            const ticketsData = await fetchTicketsAction(undefined, `tickets?${queryString}`);
-            setTickets(ticketsData);
+
+            const response = await fetchTicketsAction(undefined, `tickets?${queryString}`);
+            setTickets(response.tickets);
+            setTotalPages(response.totalPages);
+            setCurrentPage(response.currentPage);
             setError(null);
         } catch (error: any) {
             console.log("errorrrr", error)
@@ -83,8 +91,8 @@ const AllTickets = () => {
     };
 
     useEffect(() => {
-        fetchTickets();
-    }, [filters]);
+        fetchTickets(currentPage, limit);
+    }, [filters, currentPage, limit]);
 
     useEffect(() => {
         // When `users` is available, update `assignees`
@@ -165,8 +173,12 @@ const AllTickets = () => {
 
             <div className="mt-4">
                 {error && <p className="text-red-500">Error: {error}</p>}
-                {!error && tickets.length > 0 ? (
-                    <Table columns={columns} data={tickets} />
+                {!error && tickets?.length > 0 ? (
+                    <Table columns={columns} data={tickets} currentPage={currentPage}
+                        totalPages={totalPages}
+                        setCurrentPage={setCurrentPage}
+                        limit={limit}
+                        setLimit={setLimit} />
                 ) : (
                     <p className="text-gray-600">No tickets available.</p>
                 )}

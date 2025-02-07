@@ -39,22 +39,29 @@ export async function createTicketAction(ticketData: TicketFormData) {
  * @returns {Promise<object>} - List of tickets
  */
 export async function fetchTicketsAction(
-    status?: 'In-Progress' | 'Closed' | "Hold",
-    endpoint: string = 'tickets' // Default endpoint
+    status?: 'In-Progress' | 'Closed' | 'Hold',
+    endpoint: string = 'tickets/status',
+    page: number = 1, // Default to page 1
+    limit: number = 10 // Default limit 10
 ) {
     try {
+        const query: Record<string, string> = {};
+        if (status) query.status = status;
+        query.page = String(page);
+        query.limit = String(limit);
+
         const res = await httpClient({
             endpoint: endpoint,
             method: 'GET',
-            query: status ? { status } : {}, // Pass status only if provided
-
+            query, // ✅ Send status, page, and limit
         });
 
-        return await res.json(); // Parse and return JSON response
+        return await res.json();
     } catch (error: any) {
         return { status: 'error', message: error.message };
     }
 }
+
 
 /**
  * Fetch tickets by status (and optionally by assigned user)
@@ -62,13 +69,18 @@ export async function fetchTicketsAction(
  */
 export async function fetchTicketsbyStatus(
     status?: "In-Progress" | "Closed" | "Hold",
-    assignTo?: string, // Added optional assignTo parameter
-    endpoint: string = "tickets"
+    assignTo?: string,
+    page: number = 1, // Added pagination support
+    limit: number = 10, // Default limit is 10
+    endpoint: string = "tickets/status"
 ) {
     try {
+
         const query: Record<string, string> = {};
         if (status) query.status = status;
         if (assignTo) query.assignTo = assignTo; // ✅ Add assignTo filter
+        query.page = String(page); // ✅ Convert numbers to string
+        query.limit = String(limit);
 
         // console.log("Fetching Tickets with Query:", query); // Debugging Log
 

@@ -18,6 +18,10 @@ const OpenTickets = () => {
     const [error, setError] = useState<string | null>(null);
     const [assignees, setAssignees] = useState<assigneesType>();
     const { users, isLoading, isError } = useUsers();
+    const [currentPage, setCurrentPage] = useState(1);
+    const [limit, setLimit] = useState(10);
+    const [totalPages, setTotalPages] = useState(1);
+
 
     const [filters, setFilters] = useState({
         assignTo: "",
@@ -45,18 +49,23 @@ const OpenTickets = () => {
         const fetchTickets = async () => {
             try {
                 setError(null);
-                const openTickets = await fetchTicketsbyStatus("In-Progress", filters.assignTo, "tickets/status");
-
-                // console.log("Tickets Data:", openTickets); // ✅ Debugging Log
-
-                setTickets(openTickets?.tickets || []);
+                const response = await fetchTicketsbyStatus(
+                    "In-Progress",
+                    filters.assignTo,
+                    currentPage, // ✅ Pass pagination
+                    limit // ✅ Pass pagination
+                );
+                setTickets(response?.tickets || []);
+                setTotalPages(response?.totalPages || 1); // Store total pages
+                setCurrentPage(response?.currentPage || 1); // Ensure current page syncs
             } catch (error: any) {
                 setError(error.message);
             }
         };
 
         fetchTickets();
-    }, [filters.assignTo]);
+    }, [filters.assignTo, currentPage, limit]); // Re-fetch when filters, page, or limit change
+
 
 
     return (
@@ -76,7 +85,14 @@ const OpenTickets = () => {
             </select>
             {error && <p className="text-red-500">Error: {error}</p>}
             {!error && tickets.length > 0 ? (
-                <Table columns={columns} data={tickets} />
+                <Table
+                    columns={columns}
+                    data={tickets}
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    setCurrentPage={setCurrentPage}
+                    limit={limit}
+                    setLimit={setLimit} />
             ) : (
                 <p className="text-gray-600">No tickets available.</p>
             )}

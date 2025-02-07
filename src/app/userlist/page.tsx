@@ -22,30 +22,23 @@ interface assigneesType {
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
     [`&.${tableCellClasses.head}`]: {
-        backgroundColor: theme.palette.common.black,
-        color: theme.palette.common.white,
-        padding: theme.spacing(1.5), // Reduced padding for better alignment
-        textAlign: "center",
-        fontSize: "16px",
+        backgroundColor: "#F8F9FD",
+        color: "#060606",
         fontWeight: "bold",
+        textAlign: "center",
         whiteSpace: "nowrap",
+        overflow: "hidden",
+        textOverflow: "ellipsis",
     },
     [`&.${tableCellClasses.body}`]: {
-        fontSize: 14,
-        padding: theme.spacing(1),
         textAlign: "center",
-        wordWrap: "break-word",
+        whiteSpace: "nowrap", // Prevent text wrapping in body cells
+        overflow: "hidden", // Hide overflow text
+        textOverflow: "ellipsis", // Add ellipsis for overflow text
+        minWidth: "180px"
     },
 }));
 
-const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    "&:nth-of-type(odd)": {
-        backgroundColor: theme.palette.action.hover,
-    },
-    "&:last-child td, &:last-child th": {
-        border: 0,
-    },
-}));
 
 export default function CompletedRefundsTable() {
     const [allUsers, setAllUsers] = useState<assigneesType>();
@@ -70,7 +63,7 @@ export default function CompletedRefundsTable() {
             <div className="w-full pt-16 pb-10 px-6">
                 <div className="flex justify-end my-5">
                     <Link
-                        className="bg-[#d72f59] text-white px-4 py-2 rounded hover:bg-[#b52547] transition duration-200"
+                        className="bg-[#0caf60] text-white px-4 py-2 rounded hover:bg-[#b52547] transition duration-200"
                         href="/create-a-new-user" // Use onClick for handling navigation
                     >
                         Create a User
@@ -103,7 +96,7 @@ export default function CompletedRefundsTable() {
                                 </TableHead>
                                 <TableBody>
                                     {allUsers?.users.map((request: any, index) => (
-                                        <StyledTableRow key={request._id}>
+                                        <TableRow key={request._id}>
                                             <StyledTableCell align="center">
                                                 {index + 1}
                                             </StyledTableCell>
@@ -122,7 +115,7 @@ export default function CompletedRefundsTable() {
                                             <StyledTableCell align="center">
                                                 {request.role}
                                             </StyledTableCell>
-                                        </StyledTableRow>
+                                        </TableRow>
                                     ))}
                                 </TableBody>
                             </Table>

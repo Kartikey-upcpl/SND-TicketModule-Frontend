@@ -211,6 +211,23 @@ const TicketPage: React.FC = () => {
         }
     };
 
+    const formatISTDate = (utcDateString: string) => {
+        const utcDate = new Date(utcDateString);
+
+        const options: Intl.DateTimeFormatOptions = {
+            timeZone: "Asia/Kolkata",
+            hour12: true,
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            day: "2-digit",
+            month: "short", // "short" gives month in "Feb" format
+            year: "numeric", // "numeric" gives the full year (e.g., "2025")
+        };
+
+        return new Intl.DateTimeFormat("en-IN", options).format(utcDate);
+    };
+
     if (loading) return <p>Loading ticket details...</p>;
     if (error) return <p>Error: {error}</p>;
     if (!ticket) return <p>No ticket found.</p>;
@@ -223,7 +240,7 @@ const TicketPage: React.FC = () => {
                 </h1>
                 <div className="flex flex-row justify-between items-center mb-8">
                     <p className="sm:text-lg font-semibold">
-                        <span className="text-gray-600">Ticket ID:</span>
+                        <span className="text-gray-600">Ticket ID:</span>{" "}
                         <span className="text-[#0CAF60]">{ticket.ticketId}</span>
                     </p>
 
@@ -244,8 +261,12 @@ const TicketPage: React.FC = () => {
                 {/* Ticket Details */}
                 <div className="space-y-6 mb-8">
                     <p className="sm:text-lg font-semibold">
-                        <span className="text-gray-600">Order ID:</span>
+                        <span className="text-gray-600">Order ID:</span>{" "}
                         <span className="text-[#bb1467]">{ticket.orderId}</span>
+                    </p>
+                    <p className="sm:text-lg font-semibold">
+                        <span className="text-gray-600">Order Source:</span>{" "}
+                        <span className="text-[#37a3ff] ">{ticket.marketplace}</span>
                     </p>
                     <div className="text-gray-700">
                         <strong className="text-gray-700">Customer:</strong> {ticket.customer}
@@ -468,7 +489,7 @@ const TicketPage: React.FC = () => {
                             </div>
                             <div className="text-xs bg-[#e1e1e1] rounded-sm text-center text-[#0caf60] mt-3 italic w-fit p-1">
                                 <strong>{comment.commentedBy.toUpperCase()}</strong> at{" "}
-                                {new Date(comment.commentedAt).toLocaleString()}
+                                <p>Commented At: {formatISTDate(comment.commentedAt)}</p>
                             </div>
                         </div>
                     ))}
